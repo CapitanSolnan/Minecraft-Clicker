@@ -3,7 +3,7 @@ name: Desplegar Main y Legacy a GitHub Pages
 on:
   push:
     branches:
-      - main # Se ejecuta cada vez que actualizas main
+      - main
 
 permissions:
   contents: write
@@ -26,5 +26,5 @@ jobs:
       - name: Desplegar todo a GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: . # Sube todo el directorio raíz, que ahora incluye /legacy
-          branch: gh-pages # Crear/actualizar la rama de publicación
+          folder: .
+          branch: gh-pages
