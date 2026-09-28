@@ -19,7 +19,6 @@ jobs:
         run: |
           mkdir -p legacy
           git clone --single-branch --branch legacy https://github.com{{ github.repository }}.git legacy-temp
-          # Copia el contenido de legacy (evitando la carpeta .git) dentro de /legacy
           rsync -av --exclude='.git' legacy-temp/ legacy/
           rm -rf legacy-temp
 
