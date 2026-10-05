@@ -1,104 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <title>Minecraft Clicker</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Minecraft Clicker - Login</title>
+    <link rel="stylesheet" href="auth.css">
 </head>
-
 <body>
 
-    <!-- VIDEO FONDO -->
     <div class="videoborder">
         <video src="img/Video.mp4" autoplay loop muted></video>
     </div>
 
     <div class="contenedor">
-        <br>
         <h1></h1>
+        
+        <div id="auth-section">
+            <h3>Iniciar Sesión / Registrarse</h3>
+            <input type="email" id="email" placeholder="Correo electrónico">
+            <input type="password" id="password" placeholder="Contraseña">
+            <br>
+            <button id="btn-register">Registrarse</button>
+            <button id="btn-login">Iniciar Sesión</button>
+            
+            <br><br>
+            <button id="btn-google">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.18v3.15C3.17 21.36 7.23 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.18C.43 8.08 0 9.79 0 12s.43 3.92 1.18 5.42l4.1-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.64 1.18 6.58l4.1 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+                Iniciar sesión con Google
+            </button>
 
-        <!-- TIMER -->
-        <div class="timer" id="timer">Tiempo transcurrido: 0</div>
-
-        <!-- GUARDAR / CARGAR -->
-        <p class="div-cargar">Cargar Progreso</p>
-        <button class="guardar" id="guardar">Guardar Progreso</button>
-        <p class="div-guardar">Guardar Progreso</p>
-        <input type="file" onchange="onChange(event)" class="cargar" id="cargar">
-
-        <!-- ZONA CLICK -->
-        <div class="contenedor2">
-            <div class="click" id="click"></div>
-            <div class="contador" id="contador">0 ESMERALDAS</div>
-            <div class="xseg" id="xseg">0 /seg | +1 por click</div>
+            <p id="user-status">Comprobando sesión...</p>
         </div>
+    </div> <!-- FIN DE .contenedor -->
 
-        <!-- INVENTARIO -->
-        <div class="inventario">
-            <div class="inv-header">Inventario</div>
-
-            <div class="inv-grid">
-
-                <div class="slot mej-tronco" id="mej-tronco">
-                    <span id="text-tronco"></span>
-                    <button id="Comprar-tronco"></button>
-                    <button id="Vender-tronco"></button>
-                </div>
-
-                <div class="slot mej-piedra" id="mej-piedra">
-                    <span id="text-piedra"></span>
-                    <button id="Comprar-piedra"></button>
-                    <button id="Vender-piedra"></button>
-                </div>
-
-                <div class="slot mej-carbon" id="mej-carbon">
-                    <span id="text-carbon"></span>
-                    <button id="Comprar-carbon"></button>
-                    <button id="Vender-carbon"></button>
-                </div>
-
-                <div class="slot mej-hierro" id="mej-hierro">
-                    <span id="text-hierro"></span>
-                    <button id="Comprar-hierro"></button>
-                    <button id="Vender-hierro"></button>
-                </div>
-
-                <div class="slot mej-lapiz" id="mej-lapiz">
-                    <span id="text-lapiz"></span>
-                    <button id="Comprar-lapiz"></button>
-                    <button id="Vender-lapiz"></button>
-                </div>
-
-                <div class="slot mej-redstone" id="mej-redstone">
-                    <span id="text-redstone"></span>
-                    <button id="Comprar-redstone"></button>
-                    <button id="Vender-redstone"></button>
-                </div>
-
-                <div class="slot mej-oro" id="mej-oro">
-                    <span id="text-oro"></span>
-                    <button id="Comprar-oro"></button>
-                    <button id="Vender-oro"></button>
-                </div>
-
-                <div class="slot mej-diamante" id="mej-diamante">
-                    <span id="text-diamante"></span>
-                    <button id="Comprar-diamante"></button>
-                    <button id="Vender-diamante"></button>
-                </div>
-
-                <div class="slot mej-obsidiana" id="mej-obsidiana">
-                    <span id="text-obsidiana"></span>
-                    <button id="Comprar-obsidiana"></button>
-                    <button id="Vender-obsidiana"></button>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-    <script src="script.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Clicker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- VIDEO FONDO -->
+    <div class="videoborder">
+        <video src="img/Video.mp4" autoplay loop muted></video>
+    </div>
+
+    <div class="contenedor">
+        <br>
+        <h1></h1>
+
+        <!-- TIMER -->
+        <div class="timer" id="timer">Tiempo transcurrido: 0</div>
+
+        <!-- GUARDAR / CARGAR -->
+        <p class="div-cargar">Cargar Progreso</p>
+        <button class="guardar" id="guardar">Guardar Progreso</button>
+        <p class="div-guardar">Guardar Progreso</p>
+        <input type="file" onchange="onChange(event)" class="cargar" id="cargar">
+
+        <!-- ZONA CLICK -->
+        <div class="contenedor2">
+            <div class="click" id="click"></div>
+            <div class="contador" id="contador">0 ESMERALDAS</div>
+            <div class="xseg" id="xseg">0 /seg | +1 por click</div>
+        </div>
+
+        <!-- INVENTARIO -->
+        <div class="inventario">
+            <div class="inv-header">Inventario</div>
+
+            <div class="inv-grid">
+
+                <div class="slot mej-tronco" id="mej-tronco">
+                    <span id="text-tronco"></span>
+                    <button id="Comprar-tronco"></button>
+                    <button id="Vender-tronco"></button>
+                </div>
+
+                <div class="slot mej-piedra" id="mej-piedra">
+                    <span id="text-piedra"></span>
+                    <button id="Comprar-piedra"></button>
+                    <button id="Vender-piedra"></button>
+                </div>
+
+                <div class="slot mej-carbon" id="mej-carbon">
+                    <span id="text-carbon"></span>
+                    <button id="Comprar-carbon"></button>
+                    <button id="Vender-carbon"></button>
+                </div>
+
+                <div class="slot mej-hierro" id="mej-hierro">
+                    <span id="text-hierro"></span>
+                    <button id="Comprar-hierro"></button>
+                    <button id="Vender-hierro"></button>
+                </div>
+
+                <div class="slot mej-lapiz" id="mej-lapiz">
+                    <span id="text-lapiz"></span>
+                    <button id="Comprar-lapiz"></button>
+                    <button id="Vender-lapiz"></button>
+                </div>
+
+                <div class="slot mej-redstone" id="mej-redstone">
+                    <span id="text-redstone"></span>
+                    <button id="Comprar-redstone"></button>
+                    <button id="Vender-redstone"></button>
+                </div>
+
+                <div class="slot mej-oro" id="mej-oro">
+                    <span id="text-oro"></span>
+                    <button id="Comprar-oro"></button>
+                    <button id="Vender-oro"></button>
+                </div>
+
+                <div class="slot mej-diamante" id="mej-diamante">
+                    <span id="text-diamante"></span>
+                    <button id="Comprar-diamante"></button>
+                    <button id="Vender-diamante"></button>
+                </div>
+
+                <div class="slot mej-obsidiana" id="mej-obsidiana">
+                    <span id="text-obsidiana"></span>
+                    <button id="Comprar-obsidiana"></button>
+                    <button id="Vender-obsidiana"></button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

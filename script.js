@@ -282,7 +282,6 @@ document.querySelector('.cargar').addEventListener('change', function(event) {
             timer    = save.timer    || 0;
 
             if (save.estado) {
-                // Formato nuevo
                 MEJORAS.forEach(function(m) {
                     if (save.estado[m.id]) {
                         estado[m.id].cantidad     = save.estado[m.id].cantidad;
@@ -291,12 +290,8 @@ document.querySelector('.cargar').addEventListener('change', function(event) {
                         estado[m.id].desbloqueada = save.estado[m.id].desbloqueada;
                     }
                 });
-            } else {
-                // Compatibilidad con guardados del código original
-                cargarFormatoAntiguo(save);
-            }
+            } 
 
-            // Aplicar visibilidad y refrescar UI
             MEJORAS.forEach(function(m) {
                 if (estado[m.id].desbloqueada) desbloquearMejora(m.id);
                 actualizarMejoraUI(m);
@@ -309,25 +304,3 @@ document.querySelector('.cargar').addEventListener('change', function(event) {
     };
     reader.readAsText(file);
 });
-
-function cargarFormatoAntiguo(save) {
-    var mapa = {
-        tronco:    { cantidad: 'mejoraTronco',    coste: 'ValorTronco_C',    venta: 'ValorTronco_V',    des: null },
-        piedra:    { cantidad: 'mejoraPiedra',    coste: 'ValorPiedra_C',    venta: 'ValorPiedra_V',    des: 'mejoraPiedraDesbloqueada' },
-        carbon:    { cantidad: 'mejoraCarbon',    coste: 'ValorCarbon_C',    venta: 'ValorCarbon_V',    des: 'mejoraCarbonDesbloqueada' },
-        hierro:    { cantidad: 'mejoraHierro',    coste: 'ValorHierro_C',    venta: 'ValorHierro_V',    des: 'mejoraHierroDesbloqueada' },
-        lapiz:     { cantidad: 'mejoraLapiz',     coste: 'ValorLapiz_C',     venta: 'ValorLapiz_V',     des: 'mejoraLapizDesbloqueada' },
-        redstone:  { cantidad: 'mejoraRedstone',  coste: 'ValorRedstone_C',  venta: 'ValorRedstone_V',  des: 'mejoraRedstoneDesbloqueada' },
-        oro:       { cantidad: 'mejoraOro',       coste: 'ValorOro_C',       venta: 'ValorOro_V',       des: 'mejoraOroDesbloqueada' },
-        diamante:  { cantidad: 'mejoraDiamante',  coste: 'ValorDiamante_C',  venta: 'ValorDiamante_V',  des: 'mejoraDiamanteDesbloqueada' },
-        obsidiana: { cantidad: 'mejoraObsidiana', coste: 'ValorObsidiana_C', venta: 'ValorObsidiana_V', des: 'mejoraObsidianaDesbloqueada' },
-    };
-    MEJORAS.forEach(function(m) {
-        var k = mapa[m.id];
-        if (save[k.cantidad] !== undefined) estado[m.id].cantidad    = save[k.cantidad];
-        if (save[k.coste]    !== undefined) estado[m.id].coste       = save[k.coste];
-        if (save[k.venta]    !== undefined) estado[m.id].venta       = save[k.venta];
-        if (k.des && save[k.des] !== undefined) estado[m.id].desbloqueada = save[k.des];
-        else if (!k.des) estado[m.id].desbloqueada = true;
-    });
-}
