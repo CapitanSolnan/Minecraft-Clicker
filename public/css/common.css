@@ -1,0 +1,73 @@
+@font-face {
+    font-family: "Minecraft";
+    src: url(../content/Minecraft.woff);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Minecraft";
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body {
+    text-align: center;
+}
+
+.videoborder {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+h1 {
+    height: 160px;
+    background: url('../content/img/minecraft_title.png') no-repeat center/contain;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+.lang-switch {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 6px;
+}
+
+.lang-switch button {
+    cursor: pointer;
+    padding: 4px 10px;
+}
+
+.lang-switch button.active {
+    font-weight: bold;
+    outline: 2px solid #fff;
+}

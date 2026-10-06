@@ -1,106 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title data-i18n="title">Minecraft Clicker</title>
+    <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/game.css">
 </head>
-
 <body>
 
-    <div class="lang-switch">
-        <button data-lang="es">ES</button>
-        <button data-lang="ca">CA</button>
-        <button data-lang="en">EN</button>
-    </div>
-
     <div class="videoborder">
-        <video src="content/img/Video_background.mp4" autoplay loop muted playsinline></video>
+        <video src="content/img/Video_background.mp4" autoplay loop muted playsinline preload="metadata"></video>
     </div>
 
     <div class="contenedor">
-        <br>
-        <h1></h1>
-
-        <div class="timer" id="timer">
-            <span data-i18n="timer"></span> <span id="timer-value">0</span>
-        </div>
-        <div class="save-status" id="save-status"></div>
-
-        <button class="guardar" id="guardar" data-i18n="save"></button>
-        <p class="div-guardar" data-i18n="save"></p>
-
-        <div class="contenedor2">
-            <div class="click" id="click"></div>
-            <div class="contador" id="contador"></div>
-            <div class="xseg" id="xseg"></div>
-        </div>
-
-        <div class="inventario">
-            <div class="inv-header" data-i18n="inventory"></div>
-
-            <div class="inv-grid">
-
-                <div class="slot mej-tronco" id="mej-tronco">
-                    <span id="text-tronco"></span>
-                    <button id="Comprar-tronco"></button>
-                    <button id="Vender-tronco"></button>
-                </div>
-
-                <div class="slot mej-piedra" id="mej-piedra">
-                    <span id="text-piedra"></span>
-                    <button id="Comprar-piedra"></button>
-                    <button id="Vender-piedra"></button>
-                </div>
-
-                <div class="slot mej-carbon" id="mej-carbon">
-                    <span id="text-carbon"></span>
-                    <button id="Comprar-carbon"></button>
-                    <button id="Vender-carbon"></button>
-                </div>
-
-                <div class="slot mej-hierro" id="mej-hierro">
-                    <span id="text-hierro"></span>
-                    <button id="Comprar-hierro"></button>
-                    <button id="Vender-hierro"></button>
-                </div>
-
-                <div class="slot mej-lapiz" id="mej-lapiz">
-                    <span id="text-lapiz"></span>
-                    <button id="Comprar-lapiz"></button>
-                    <button id="Vender-lapiz"></button>
-                </div>
-
-                <div class="slot mej-redstone" id="mej-redstone">
-                    <span id="text-redstone"></span>
-                    <button id="Comprar-redstone"></button>
-                    <button id="Vender-redstone"></button>
-                </div>
-
-                <div class="slot mej-oro" id="mej-oro">
-                    <span id="text-oro"></span>
-                    <button id="Comprar-oro"></button>
-                    <button id="Vender-oro"></button>
-                </div>
-
-                <div class="slot mej-diamante" id="mej-diamante">
-                    <span id="text-diamante"></span>
-                    <button id="Comprar-diamante"></button>
-                    <button id="Vender-diamante"></button>
-                </div>
-
-                <div class="slot mej-obsidiana" id="mej-obsidiana">
-                    <span id="text-obsidiana"></span>
-                    <button id="Comprar-obsidiana"></button>
-                    <button id="Vender-obsidiana"></button>
-                </div>
-
+        <div class="topbar">
+            <div class="topbar-info">
+                <div class="timer"><span data-i18n="timer"></span> <span id="timer-value">0s</span></div>
+                <div class="save-status" id="save-status" aria-live="polite"></div>
             </div>
+
+            <div class="lang-switch">
+                <button data-lang="es">ES</button>
+                <button data-lang="ca">CA</button>
+                <button data-lang="en">EN</button>
+            </div>
+
+            <div></div>
         </div>
 
+        <h1><span class="sr-only">Minecraft Clicker</span></h1>
+
+        <main class="juego">
+            <div class="contenedor2">
+                <button class="click" id="click" data-i18n-aria="mineAria"></button>
+                <div class="contador" id="contador"></div>
+                <div class="xseg" id="xseg"></div>
+            </div>
+
+            <div class="inventario">
+                <div class="inv-header" data-i18n="inventory"></div>
+                <div class="inv-grid" id="inv-grid"></div>
+            </div>
+        </main>
+
+        <div class="acciones">
+            <button class="logout" id="logout" data-i18n="logout"></button>
+            <button class="guardar" id="guardar" data-i18n="save"></button>
+        </div>
     </div>
-    <script src="js/i18n.js"></script>
+
+    <script type="module" src="js/i18n.js"></script>
     <script type="module" src="js/game.js"></script>
 </body>
 </html>

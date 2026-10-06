@@ -5,8 +5,6 @@ Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft
 ---
 
 ## 🎨 Interfaz y Visuales
-- [x] Implementar **Fondo de pantalla** dinámico
-- [ ] Mejorar el formato de los **números del timer y de los precios** (legibilidad)
 - [ ] Cuadrar las cosas
 
 ---
@@ -41,7 +39,3 @@ Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft
 - [ ] 🟣 **End Crystal** -> Huevo de dragona
 - [ ] 📦 **Frag. de shulker** -> Shulker
 - [ ] 🪽 **Élitras** -> Final
-
-## Traduccion
-- [x] Ingles
-- [x] Catalan

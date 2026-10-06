@@ -1,254 +1,219 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { auth, db } from "./firebase.js";
 import { t, tItem, setLang, getLang } from "./i18n.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC3YYcsHk3ceduiWPOBm6oJZBp_ZiArYsg",
-  authDomain: "minecraft-clicker-3cd9b.firebaseapp.com",
-  projectId: "minecraft-clicker-3cd9b",
-  storageBucket: "minecraft-clicker-3cd9b.firebasestorage.app",
-  messagingSenderId: "308705407124",
-  appId: "1:308705407124:web:6fb19ff52073f2db788481",
-  measurementId: "G-VKGX649NEW"
-};
+// ── Configuración
+const CRECIMIENTO = 1.15; 
+const MAX_OFFLINE_S = 8 * 3600;
+const AUTOSAVE_MS = 60 * 1000;
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const MEJORAS = [
+    { id: 'tronco',    costeBase: 10,            clickBonus: 1,   pasivo: 0,      desbloquea: 'piedra',    oculto: false },
+    { id: 'piedra',    costeBase: 100,           clickBonus: 5,   pasivo: 0,      desbloquea: 'carbon' },
+    { id: 'carbon',    costeBase: 1_000,         clickBonus: 5,   pasivo: 2,      desbloquea: 'hierro' },
+    { id: 'hierro',    costeBase: 50_000,        clickBonus: 10,  pasivo: 10,     desbloquea: 'lapiz' },
+    { id: 'lapiz',     costeBase: 500_000,       clickBonus: 10,  pasivo: 50,     desbloquea: 'redstone' },
+    { id: 'redstone',  costeBase: 5_000_000,     clickBonus: 50,  pasivo: 250,    desbloquea: 'oro' },
+    { id: 'oro',       costeBase: 50_000_000,    clickBonus: 50,  pasivo: 1_250,  desbloquea: 'diamante' },
+    { id: 'diamante',  costeBase: 500_000_000,   clickBonus: 250, pasivo: 6_250,  desbloquea: 'obsidiana' },
+    { id: 'obsidiana', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea: null },
+];
+MEJORAS.forEach(m => { m.oculto = m.oculto !== false; });
 
-// ── Estado global
+// ── Estado
 let contador = 0;
 let timer = 0;
-
-// ── Configuración de mejoras
-const MEJORAS = [
-    { id: 'tronco',    costeBase: 10,            costePaso: 10,            clickBonus: 1,   pasivoPorUnidad: 0,      escala: 1,   sufijo: ' $',  desbloquea: 'piedra',    oculto: false },
-    { id: 'piedra',    costeBase: 100,           costePaso: 100,           clickBonus: 5,   pasivoPorUnidad: 0,      escala: 1,   sufijo: ' $',  desbloquea: 'carbon',    oculto: true },
-    { id: 'carbon',    costeBase: 1_000,         costePaso: 500,           clickBonus: 5,   pasivoPorUnidad: 2,      escala: 1_000, sufijo: 'k $', desbloquea: 'hierro',    oculto: true },
-    { id: 'hierro',    costeBase: 50_000,        costePaso: 25_000,        clickBonus: 10,  pasivoPorUnidad: 10,     escala: 1_000, sufijo: 'k $', desbloquea: 'lapiz',     oculto: true },
-    { id: 'lapiz',     costeBase: 500_000,       costePaso: 250_000,       clickBonus: 10,  pasivoPorUnidad: 50,     escala: 1_000, sufijo: 'k $', desbloquea: 'redstone',  oculto: true },
-    { id: 'redstone',  costeBase: 5_000_000,     costePaso: 2_500_000,     clickBonus: 50,  pasivoPorUnidad: 250,    escala: 1e6, sufijo: 'M $', desbloquea: 'oro',       oculto: true },
-    { id: 'oro',       costeBase: 50_000_000,    costePaso: 25_000_000,    clickBonus: 50,  pasivoPorUnidad: 1_250,  escala: 1e6, sufijo: 'M $', desbloquea: 'diamante',  oculto: true },
-    { id: 'diamante',  costeBase: 500_000_000,   costePaso: 250_000_000,   clickBonus: 250, pasivoPorUnidad: 6_250,  escala: 1e6, sufijo: 'M $', desbloquea: 'obsidiana', oculto: true },
-    { id: 'obsidiana', costeBase: 5_000_000_000, costePaso: 2_500_000_000, clickBonus: 250, pasivoPorUnidad: 31_250, escala: 1e9, sufijo: 'B $', desbloquea: null,        oculto: true },
-];
-
-// ── Estado dinámico
 const estado = {};
-MEJORAS.forEach(m => {
-    estado[m.id] = {
-        cantidad:     0,
-        coste:        m.costeBase,
-        venta:        m.costeBase / 2,
-        desbloqueada: !m.oculto,
-    };
-});
+MEJORAS.forEach(m => { estado[m.id] = { cantidad: 0, desbloqueada: !m.oculto }; });
 
-// ── Calcular totales
-function calcularPasivo() {
-    return MEJORAS.reduce((sum, m) =>
-        sum + estado[m.id].cantidad * m.pasivoPorUnidad, 0);
-}
-
-function calcularBonusClick() {
-    return MEJORAS.reduce((sum, m) =>
-        sum + estado[m.id].cantidad * m.clickBonus, 0);
-}
+const costeDe   = (m, n = estado[m.id].cantidad) => Math.floor(m.costeBase * CRECIMIENTO ** n);
+const ventaDe   = m => Math.floor(costeDe(m, estado[m.id].cantidad - 1) / 2);
+const calcularPasivo     = () => MEJORAS.reduce((s, m) => s + estado[m.id].cantidad * m.pasivo, 0);
+const calcularBonusClick = () => MEJORAS.reduce((s, m) => s + estado[m.id].cantidad * m.clickBonus, 0);
 
 // ── Formato
-function formatearPrecio(valor, escala, sufijo) {
-    return (valor / escala).toFixed(2) + sufijo;
+const SUFIJOS = ['', 'k', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+function formatear(n) {
+    if (!isFinite(n)) return '∞';
+    const signo = n < 0 ? '-' : '';
+    n = Math.abs(n);
+    if (n < 1000) return signo + new Intl.NumberFormat(getLang(), { maximumFractionDigits: 2 }).format(Math.floor(n * 100) / 100);
+    let i = Math.min(Math.floor(Math.log10(n) / 3), SUFIJOS.length - 1);
+    let v = Math.floor(n / 1000 ** i * 100) / 100;
+    if (v >= 1000 && i < SUFIJOS.length - 1) { v = Math.floor(v / 1000 * 100) / 100; i++; }
+    return signo + new Intl.NumberFormat(getLang(), { maximumFractionDigits: 2 }).format(v) + SUFIJOS[i];
+}
+// Formato timer 
+function formatearTiempo(s) {
+    s = Math.floor(s);
+    const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, seg = s % 60;
+    const p = n => String(n).padStart(2, '0');
+    if (h > 0) return h + 'h ' + p(m) + 'm ' + p(seg) + 's';
+    if (m > 0) return m + 'm ' + p(seg) + 's';
+    return seg + 's';
 }
 
-function formatearContador(n) {
-    return Math.floor(n * 100) / 100 + ' ' + t('emeralds');
-}
+// ── Generar slots desde MEJORAS
+const grid = document.getElementById('inv-grid');
+MEJORAS.forEach(m => {
+    const icono = m.id[0].toUpperCase() + m.id.slice(1);
+    const slot = document.createElement('div');
+    slot.className = 'slot' + (m.oculto ? ' locked' : '');
+    slot.id = 'mej-' + m.id;
+    const iconoUrl = new URL(`content/img/minecraft_icons/${icono}.png`, document.baseURI).href;
+    slot.style.setProperty('--icon', `url("${iconoUrl}")`);
+    slot.innerHTML = `<span id="text-${m.id}"></span>
+        <button id="Comprar-${m.id}"></button>
+        <button id="Vender-${m.id}"></button>`;
+    grid.appendChild(slot);
+    slot.querySelector('#Comprar-' + m.id).addEventListener('click', () => comprar(m));
+    slot.querySelector('#Vender-' + m.id).addEventListener('click', () => vender(m));
+});
 
 // ── Renderizado
-function actualizarTimer() {
-    document.getElementById('timer-value').textContent = timer;
-}
-
 function actualizarUI() {
-    const pasivo     = calcularPasivo();
-    const bonusClick = calcularBonusClick();
-
-    document.getElementById('contador').textContent = formatearContador(contador);
+    document.getElementById('contador').textContent = formatear(contador) + ' ' + t('emeralds');
     document.getElementById('xseg').textContent =
-        pasivo + ' ' + t('perSec') + '  |  +' + (1 + bonusClick) + ' ' + t('perClick');
+        formatear(calcularPasivo()) + ' ' + t('perSec') + '  |  +' + formatear(1 + calcularBonusClick()) + ' ' + t('perClick');
+    document.getElementById('timer-value').textContent = formatearTiempo(timer);
 }
 
 function actualizarMejoraUI(m) {
     const e = estado[m.id];
-    document.getElementById('text-' + m.id).textContent =
-        t('upgradeOf', { n: e.cantidad, name: tItem(m.id) });
-    document.getElementById('Comprar-' + m.id).textContent =
-        t('buyFor', { price: formatearPrecio(e.coste, m.escala, m.sufijo) });
-    document.getElementById('Vender-' + m.id).textContent =
-        t('sellFor', { price: formatearPrecio(e.venta, m.escala, m.sufijo) });
+    document.getElementById('text-' + m.id).textContent = t('upgradeOf', { n: e.cantidad, name: tItem(m.id) });
+    const comprar = document.getElementById('Comprar-' + m.id);
+    const vender  = document.getElementById('Vender-' + m.id);
+    comprar.textContent = t('buyFor', { price: formatear(costeDe(m)) + ' $' });
+    vender.textContent  = t('sellFor', { price: formatear(e.cantidad ? ventaDe(m) : 0) + ' $' });
+    comprar.disabled = contador < costeDe(m);
+    vender.disabled  = e.cantidad < 1;
 }
 
-// Repinta TODO (se usa al cambiar de idioma)
 function renderTodo() {
     actualizarUI();
-    actualizarTimer();
     MEJORAS.forEach(actualizarMejoraUI);
 }
 
 function desbloquearMejora(id) {
     if (!id) return;
-    const e = estado[id];
-    if (e.desbloqueada) return;
-    e.desbloqueada = true;
-    document.querySelector('.mej-' + id).style.display = 'block';
+    estado[id].desbloqueada = true;
+    document.getElementById('mej-' + id).classList.remove('locked');
 }
 
-// ── Compra / Venta
+// ── Compra / venta
 function comprar(m) {
     const e = estado[m.id];
-    if (contador < e.coste) return;
-
-    contador  -= e.coste;
+    const coste = costeDe(m);
+    if (contador < coste) return;
+    contador -= coste;
     e.cantidad++;
-    e.coste   += m.costePaso;
-    e.venta    = e.coste / 2;
-
-    actualizarMejoraUI(m);
-    actualizarUI();
-
     if (e.cantidad >= 10) desbloquearMejora(m.desbloquea);
+    renderTodo();
 }
 
 function vender(m) {
     const e = estado[m.id];
     if (e.cantidad < 1) return;
-
-    contador  += e.venta;
+    contador += ventaDe(m);
     e.cantidad--;
-    e.coste   -= m.costePaso;
-    e.venta    = e.coste / 2;
-
-    actualizarMejoraUI(m);
-    actualizarUI();
+    renderTodo();
 }
 
-// Registrar listeners
-MEJORAS.forEach(m => {
-    document.getElementById('Comprar-' + m.id).addEventListener('click', function() { comprar(m); });
-    document.getElementById('Vender-'  + m.id).addEventListener('click', function() { vender(m); });
-});
-
 // ── Click manual
-document.getElementById('click').addEventListener('click', function() {
-    contador += 1 + calcularBonusClick();
-    actualizarUI();
+document.getElementById('click').addEventListener('click', function (ev) {
+    const ganancia = 1 + calcularBonusClick();
+    contador += ganancia;
+
+
+    renderTodo();
 });
 
-// ── Tick por segundo
-setInterval(function() {
-    timer++;
-    contador += calcularPasivo();
+// ── Tick con delta de tiempo real
+let ultimo = Date.now();
+function avanzar(segundos) {
+    timer += segundos;
+    contador += calcularPasivo() * segundos;
+}
+setInterval(() => {
+    const ahora = Date.now();
+    avanzar(Math.min((ahora - ultimo) / 1000, MAX_OFFLINE_S));
+    ultimo = ahora;
+    renderTodo();
+}, 250);
 
-    actualizarTimer();
-    actualizarUI();
-
-    MEJORAS.forEach(function(m) {
-        if (estado[m.id].desbloqueada) actualizarMejoraUI(m);
-    });
-}, 1000);
-
-// ══════════════════════════════════════════════
-//  GUARDADO EN FIREBASE (Firestore)
-// ══════════════════════════════════════════════
-const AUTOSAVE_MS = 5 * 60 * 1000;
+// ══════════ Guardado en Firestore ══════════
 let uid = null;
 let cargado = false;
-let autosaveIniciado = false;
+let guardando = false;
 let statusTimeout;
 
-// Recibe la CLAVE de traducción, no el texto
-function mostrarEstado(key) {
+function mostrarEstado(key, params) {
     const el = document.getElementById('save-status');
-    el.textContent = t(key);
+    el.textContent = t(key, params);
     clearTimeout(statusTimeout);
-    statusTimeout = setTimeout(function() { el.textContent = ''; }, 3000);
+    statusTimeout = setTimeout(() => { el.textContent = ''; }, 3000);
 }
 
 function crearSave() {
-    const save = { contador: contador, timer: timer, estado: {} };
-    MEJORAS.forEach(function(m) {
-        const e = estado[m.id];
-        save.estado[m.id] = {
-            cantidad:     e.cantidad,
-            coste:        e.coste,
-            venta:        e.venta,
-            desbloqueada: e.desbloqueada,
-        };
+    const save = { contador, timer, lastSeen: Date.now(), estado: {} };
+    MEJORAS.forEach(m => {
+        save.estado[m.id] = { cantidad: estado[m.id].cantidad, desbloqueada: estado[m.id].desbloqueada };
     });
     return save;
 }
 
 function aplicarSave(save) {
     contador = Number(save.contador) || 0;
-    timer    = Number(save.timer)    || 0;
-
-    MEJORAS.forEach(function(m) {
+    timer    = Number(save.timer) || 0;
+    MEJORAS.forEach(m => {
         const s = save.estado && save.estado[m.id];
-        const e = estado[m.id];
-        if (s) {
-            e.cantidad = s.cantidad;
-            e.coste    = s.coste;
-            e.venta    = s.venta;
-            e.desbloqueada = !m.oculto;
-            if (s.desbloqueada) {
-                desbloquearMejora(m.id);
-            } else if (m.oculto) {
-                document.querySelector('.mej-' + m.id).style.display = 'none';
-            }
-        }
-        actualizarMejoraUI(m);
+        if (!s) return;
+        estado[m.id].cantidad = Math.max(0, Number(s.cantidad) || 0);
+        if (s.desbloqueada || !m.oculto) desbloquearMejora(m.id);
     });
 
-    actualizarTimer();
-    actualizarUI();
-}
-
-async function guardarNube(auto) {
-    if (!uid || !cargado) {
-        mostrarEstado('loading');
-        return;
-    }
-    try {
-        await setDoc(doc(db, 'saves', uid), Object.assign(crearSave(), {
-            updatedAt: serverTimestamp(),
-        }));
-        mostrarEstado(auto ? 'autosaved' : 'saved');
-    } catch (err) {
-        console.error('Error al guardar:', err);
-        mostrarEstado('saveError');
-    }
+    // Progreso offline
+    const lejos = Math.min(Math.max((Date.now() - (Number(save.lastSeen) || Date.now())) / 1000, 0), MAX_OFFLINE_S);
+    const antes = contador;
+    avanzar(lejos);
+    ultimo = Date.now();
+    renderTodo();
+    return contador - antes;
 }
 
 async function cargarNube() {
     try {
         const snap = await getDoc(doc(db, 'saves', uid));
-        if (snap.exists()) {
-            aplicarSave(snap.data());
-            mostrarEstado('loaded');
-            return true;
-        }
-        mostrarEstado('noSave');
+        if (!snap.exists()) { mostrarEstado('noSave'); return 'nosave'; }
+        const ganado = aplicarSave(snap.data());
+        if (ganado >= 1) mostrarEstado('offlineGain', { n: formatear(ganado) });
+        else mostrarEstado('loaded');
+        return 'loaded';
     } catch (err) {
         console.error('Error al cargar:', err);
         mostrarEstado('loadError');
+        return 'error';
     }
-    return false;
 }
 
-// Guardar manual
-document.getElementById('guardar').addEventListener('click', function() {
-    guardarNube(false);
+async function guardarNube(auto) {
+    if (!uid || !cargado) { mostrarEstado('loading'); return; }
+    if (guardando) return;
+    guardando = true;
+    try {
+        await setDoc(doc(db, 'saves', uid), { ...crearSave(), updatedAt: serverTimestamp() });
+        mostrarEstado(auto ? 'autosaved' : 'saved');
+    } catch (err) {
+        console.error('Error al guardar:', err);
+        mostrarEstado('saveError');
+    } finally { guardando = false; }
+}
+
+document.getElementById('guardar').addEventListener('click', () => guardarNube(false));
+document.getElementById('logout').addEventListener('click', async () => {
+    await guardarNube(true);
+    await signOut(auth);
 });
 
 // ── Idioma
@@ -257,21 +222,14 @@ document.querySelectorAll('[data-lang]').forEach(btn => {
 });
 setLang(getLang(), renderTodo);
 
-onAuthStateChanged(auth, async function(user) {
-    if (!user) {
-        window.location.href = 'index.html';
-        return;
-    }
+// ── Sesión
+onAuthStateChanged(auth, async user => {
+    if (!user) { window.location.href = 'index.html'; return; }
     uid = user.uid;
-    await cargarNube();
-    cargado = true;
+    cargado = (await cargarNube()) !== 'error';
 
-    if (!autosaveIniciado) {
-        autosaveIniciado = true;
-        setInterval(function() { guardarNube(true); }, AUTOSAVE_MS);
-
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'hidden') guardarNube(true);
-        });
-    }
-});
+    setInterval(() => guardarNube(true), AUTOSAVE_MS);
+    const guardarAlSalir = () => { if (document.visibilityState === 'hidden') guardarNube(true); };
+    document.addEventListener('visibilitychange', guardarAlSalir);
+    window.addEventListener('pagehide', () => guardarNube(true));
+}, console.error);
