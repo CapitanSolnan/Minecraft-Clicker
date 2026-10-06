@@ -150,7 +150,7 @@ const MEJORAS = [    {
     },
 ];
 
-// ── Estado dinámico (se construye desde MEJORAS)
+// ── Estado dinámico
 const estado = {};
 MEJORAS.forEach(m => {
     estado[m.id] = {
@@ -161,7 +161,7 @@ MEJORAS.forEach(m => {
     };
 });
 
-// ── Calcular totales desde el estado (fuente de verdad)
+// ── Calcular totales
 function calcularPasivo() {
     return MEJORAS.reduce((sum, m) =>
         sum + estado[m.id].cantidad * m.pasivoPorUnidad, 0);
@@ -253,7 +253,7 @@ document.getElementById('click').addEventListener('click', function() {
 // ── Tick por segundo
 setInterval(function() {
     timer++;
-    contador += calcularPasivo();   // recalcula siempre desde el estado real
+    contador += calcularPasivo();
 
     document.getElementById('timer').innerHTML = 'Tiempo transcurrido: ' + timer;
     actualizarUI();
@@ -350,17 +350,12 @@ async function cargarNube() {
     return false;
 }
 
-// ── Botones
+
+// Guardar manual
 document.getElementById('guardar').addEventListener('click', function() {
     guardarNube(false);
 });
 
-document.getElementById('cargar').addEventListener('click', async function() {
-    if (!uid) return;
-    if (confirm('¿Cargar la partida guardada? Se perderá el progreso actual.')) {
-        await cargarNube();
-    }
-});
 
 onAuthStateChanged(auth, async function(user) {
     if (!user) {
@@ -375,6 +370,7 @@ onAuthStateChanged(auth, async function(user) {
         autosaveIniciado = true;
         setInterval(function() { guardarNube(true); }, AUTOSAVE_MS);
 
+        // intento extra al ocultar/cerrar la pestaña
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'hidden') guardarNube(true);
         });
