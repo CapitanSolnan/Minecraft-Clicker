@@ -4,11 +4,6 @@ Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft
 
 ---
 
-## 🎨 Interfaz y Visuales
-- [ ] Cuadrar las cosas
-
----
-
 ## 🌍 Overworld (Sistema de 64 unidades)
 *Primera Mejora apartir de 32 unidades del recurso se desbloquea su mejora correspondiente:*
 *Segunda Mejora apartir de 64 unidades del recurso se desbloquea su mejora correspondiente:*
