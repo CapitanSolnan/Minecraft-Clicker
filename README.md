@@ -1,8 +1,6 @@
 🌍 **English** · [Español](README.es.md) · [Català](README.ca.md)
 
 # ⛏️ Minecraft Clicker
- 
-🎮 **Juega ahora:** [minecraft-clicker-game.web.app](https://minecraft-clicker-game.web.app/)
 
 🎮 **Play now:** [minecraft-clicker-game.web.app](https://minecraft-clicker-game.web.app/)
 
