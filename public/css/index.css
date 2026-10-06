@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Minecraft";
-    src: url("Minecraft.woff");
+    src: url(../content/Minecraft.woff);
 }
 
 * {
@@ -49,8 +49,7 @@ h1 {
     width: 100%;
     max-width: 550px;
     height: 160px;
-    background: url(img/minecraft_title.png) no-repeat center/contain;
-    margin-bottom: 25px;
+    background: url('../content/img/minecraft_title.png') no-repeat center/contain;    margin-bottom: 25px;
 }
 
 #auth-section {

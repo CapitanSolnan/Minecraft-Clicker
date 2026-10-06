@@ -28,7 +28,7 @@ const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 const btnRegister = document.getElementById('btn-register');
 const btnLogin = document.getElementById('btn-login');
-const btnGoogle = document.getElementById('btn-google'); // Referencia al nuevo botón
+const btnGoogle = document.getElementById('btn-google'); 
 const userStatus = document.getElementById('user-status');
 
 btnRegister.addEventListener('click', () => {

@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Minecraft";
-    src: url("Minecraft.woff");
+    src: url(../content/Minecraft.woff);
 }
 
 * {
@@ -40,7 +40,7 @@ video {
 /* TÍTULO */
 h1 {
     height: 160px;
-    background: url(img/minecraft_title.png) no-repeat center/contain;
+    background: url('../content/img/minecraft_title.png') no-repeat center/contain;
 }
 
 /* TIMER */
@@ -64,7 +64,7 @@ h1 {
 .click {
     width: 200px;
     height: 200px;
-    background: url(img/minecraft_icons/Cesped.png) center/cover;
+    background: url(../content/img/minecraft_icons/Cesped.png) center/cover;
     border-radius: 12px;
     cursor: pointer;
     border: 2px solid black;
@@ -173,15 +173,15 @@ h1 {
 }
 
 /* ICONOS */
-.mej-tronco { background: #8b8b8b url(img/minecraft_icons/Tronco.png) center/100% no-repeat; }
-.mej-piedra { background: #8b8b8b url(img/minecraft_icons/Piedra.png) center/100% no-repeat; display: none; }
-.mej-carbon { background: #8b8b8b url(img/minecraft_icons/Carbon.png) center/100% no-repeat; display: none; }
-.mej-hierro { background: #8b8b8b url(img/minecraft_icons/Hierro.png) center/100% no-repeat; display: none; }
-.mej-lapiz { background: #8b8b8b url(img/minecraft_icons/Lapiz.png) center/100% no-repeat; display: none; }
-.mej-redstone { background: #8b8b8b url(img/minecraft_icons/Redstone.png) center/100% no-repeat; display: none; }
-.mej-oro { background: #8b8b8b url(img/minecraft_icons/Oro.png) center/100% no-repeat; display: none; }
-.mej-diamante { background: #8b8b8b url(img/minecraft_icons/Diamante.png) center/100% no-repeat; display: none; }
-.mej-obsidiana { background: #8b8b8b url(img/minecraft_icons/Obsidiana.png) center/100% no-repeat; display: none; }
+.mej-tronco { background: #8b8b8b url(../content/img/minecraft_icons/Tronco.png) center/100% no-repeat; }
+.mej-piedra { background: #8b8b8b url(../content/img/minecraft_icons/Piedra.png) center/100% no-repeat; display: none; }
+.mej-carbon { background: #8b8b8b url(../content/img/minecraft_icons/Carbon.png) center/100% no-repeat; display: none; }
+.mej-hierro { background: #8b8b8b url(../content/img/minecraft_icons/Hierro.png) center/100% no-repeat; display: none; }
+.mej-lapiz { background: #8b8b8b url(../content/img/minecraft_icons/Lapiz.png) center/100% no-repeat; display: none; }
+.mej-redstone { background: #8b8b8b url(../content/img/minecraft_icons/Redstone.png) center/100% no-repeat; display: none; }
+.mej-oro { background: #8b8b8b url(../content/img/minecraft_icons/Oro.png) center/100% no-repeat; display: none; }
+.mej-diamante { background: #8b8b8b url(../content/img/minecraft_icons/Diamante.png) center/100% no-repeat; display: none; }
+.mej-obsidiana { background: #8b8b8b url(../content/img/minecraft_icons/Obsidiana.png) center/100% no-repeat; display: none; }
 
 /* HOVER */
 .slot:hover {
