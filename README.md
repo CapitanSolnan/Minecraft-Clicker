@@ -5,10 +5,9 @@ Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft
 ---
 
 ## 🎨 Interfaz y Visuales
-- [ ] Implementar **Fondo de pantalla** dinámico
+- [x] Implementar **Fondo de pantalla** dinámico
 - [ ] Mejorar el formato de los **números del timer y de los precios** (legibilidad)
 - [ ] Cuadrar las cosas
-- [ ] Cambiar el timer
 
 ---
 
@@ -44,6 +43,5 @@ Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft
 - [ ] 🪽 **Élitras** -> Final
 
 ## Traduccion
-- [ ] Ingles
-- [ ] Catalan
-- [ ] Más...
+- [x] Ingles
+- [x] Catalan

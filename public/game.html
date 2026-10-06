@@ -3,39 +3,42 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Minecraft Clicker</title>
+    <title data-i18n="title">Minecraft Clicker</title>
     <link rel="stylesheet" href="css/game.css">
 </head>
 
 <body>
 
-    <!-- VIDEO FONDO -->
+    <div class="lang-switch">
+        <button data-lang="es">ES</button>
+        <button data-lang="ca">CA</button>
+        <button data-lang="en">EN</button>
+    </div>
+
     <div class="videoborder">
-        <video src="content/img/Video.mp4" autoplay loop muted></video>
+        <video src="content/img/Video_background.mp4" autoplay loop muted playsinline></video>
     </div>
 
     <div class="contenedor">
         <br>
         <h1></h1>
 
-        <!-- TIMER -->
-        <div class="timer" id="timer">Tiempo transcurrido: 0</div>
+        <div class="timer" id="timer">
+            <span data-i18n="timer"></span> <span id="timer-value">0</span>
+        </div>
         <div class="save-status" id="save-status"></div>
 
-        <!-- GUARDAR -->
-        <button class="guardar" id="guardar">Guardar Progreso</button>
-        <p class="div-guardar">Guardar Progreso</p>
+        <button class="guardar" id="guardar" data-i18n="save"></button>
+        <p class="div-guardar" data-i18n="save"></p>
 
-        <!-- ZONA CLICK -->
         <div class="contenedor2">
             <div class="click" id="click"></div>
-            <div class="contador" id="contador">0 ESMERALDAS</div>
-            <div class="xseg" id="xseg">0 /seg | +1 por click</div>
+            <div class="contador" id="contador"></div>
+            <div class="xseg" id="xseg"></div>
         </div>
 
-        <!-- INVENTARIO -->
         <div class="inventario">
-            <div class="inv-header">Inventario</div>
+            <div class="inv-header" data-i18n="inventory"></div>
 
             <div class="inv-grid">
 
@@ -97,7 +100,7 @@
         </div>
 
     </div>
-
+    <script src="js/i18n.js"></script>
     <script type="module" src="js/game.js"></script>
 </body>
 </html>

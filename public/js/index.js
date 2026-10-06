@@ -68,3 +68,10 @@ onAuthStateChanged(auth, (user) => {
         userStatus.innerText = "Por favor, inicia sesión para jugar.";
     }
 });
+
+import { t, setLang, getLang } from "./i18n.js";
+
+document.querySelectorAll('[data-lang]').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+});
+setLang(getLang());

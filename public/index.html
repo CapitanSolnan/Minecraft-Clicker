@@ -4,24 +4,35 @@
     <meta charset="UTF-8">
     <title>Minecraft Clicker - Login</title>
     <link rel="stylesheet" href="css/index.css">
+    <style>
+        .lang-switch { position: fixed; top: 10px; right: 10px; z-index: 10; display: flex; gap: 6px; }
+        .lang-switch button { cursor: pointer; padding: 4px 10px; }
+        .lang-switch button.active { font-weight: bold; outline: 2px solid #fff; }
+    </style>
 </head>
-<body>
+<body data-title-key="loginPageTitle">
+
+    <div class="lang-switch">
+        <button data-lang="es">ES</button>
+        <button data-lang="ca">CA</button>
+        <button data-lang="en">EN</button>
+    </div>
 
     <div class="videoborder">
-        <video src="content/img/Video.mp4" autoplay loop muted></video>
+        <video src="content/img/Video_background.mp4" autoplay loop muted playsinline></video>
     </div>
 
     <div class="contenedor">
         <h1></h1>
-        
+
         <div id="auth-section">
-            <h3>Iniciar Sesión / Registrarse</h3>
-            <input type="email" id="email" placeholder="Correo electrónico">
-            <input type="password" id="password" placeholder="Contraseña">
+            <h3 data-i18n="authTitle"></h3>
+            <input type="email" id="email" data-i18n-placeholder="email">
+            <input type="password" id="password" data-i18n-placeholder="password">
             <br>
-            <button id="btn-register">Registrarse</button>
-            <button id="btn-login">Iniciar Sesión</button>
-            
+            <button id="btn-register" data-i18n="register"></button>
+            <button id="btn-login" data-i18n="login"></button>
+
             <br><br>
             <button id="btn-google">
                 <svg class="google-icon" viewBox="0 0 24 24">
@@ -30,10 +41,10 @@
                     <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.18C.43 8.08 0 9.79 0 12s.43 3.92 1.18 5.42l4.1-3.15z"/>
                     <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.64 1.18 6.58l4.1 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                 </svg>
-                Iniciar sesión con Google
+                <span data-i18n="google"></span>
             </button>
 
-            <p id="user-status">Comprobando sesión...</p>
+            <p id="user-status" data-i18n="checkingSession"></p>
         </div>
     </div>
 
