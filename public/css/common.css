@@ -73,3 +73,12 @@ h1 {
     font-weight: bold;
     outline: 2px solid #fff;
 }
+
+.aviso {
+    margin-top: 16px;
+    color: #fff;
+    font-size: 10px;
+    line-height: 1.4;
+    text-shadow: 1px 1px #000;
+    opacity: .85;
+}

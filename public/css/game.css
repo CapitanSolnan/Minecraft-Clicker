@@ -9,7 +9,7 @@ body {
     height: 100dvh;
     padding: 12px clamp(16px, 3vw, 48px) 16px;
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     gap: 12px;
 }
 
@@ -173,6 +173,10 @@ body {
     cursor: not-allowed;
 }
 
+.aviso {
+    margin-top: 0;
+}
+
 .acciones {
     display: flex;
     justify-content: flex-end;
@@ -202,7 +206,7 @@ body {
     .contenedor {
         height: auto;
         min-height: 100dvh;
-        grid-template-rows: auto auto auto auto;
+        grid-template-rows: auto auto auto auto auto;
     }
 
     .topbar {
