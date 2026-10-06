@@ -1,6 +1,8 @@
 🌍 **English** · [Español](README.es.md) · [Català](README.ca.md)
 
 # ⛏️ Minecraft Clicker
+ 
+🎮 **Juega ahora:** [minecraft-clicker-game.web.app](https://minecraft-clicker-game.web.app/)
 
 🎮 **Play now:** [minecraft-clicker-game.web.app](https://minecraft-clicker-game.web.app/)
 
@@ -221,4 +223,8 @@ The MIT license covers **only the code**. It does not include or grant any right
 
 > **NOT AN OFFICIAL MINECRAFT GAME. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.**
 >
+<<<<<<< HEAD
 > *Minecraft* is a registered trademark of Mojang Studios / Microsoft. This is a free, non-profit fan project and is not affiliated with, endorsed or approved by them.
+=======
+> *Minecraft* es una marca registrada de Mojang Studios / Microsoft. Este es un proyecto de fans, gratuito y sin ánimo de lucro, y no está afiliado, respaldado ni aprobado por ellos.
+>>>>>>> 6a97ccac2ddfd05a8dab5a835f3dcd55079db3d0
