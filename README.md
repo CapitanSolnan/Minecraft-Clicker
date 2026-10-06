@@ -1,4 +1,6 @@
 # ⛏️ Minecraft Clicker
+ 
+🎮 **Juega ahora:** [minecraft-clicker-game.web.app](https://minecraft-clicker-game.web.app/)
 
 Juego *clicker* (idle) con temática de Minecraft, hecho con **HTML, CSS y JavaScript puro** (sin frameworks ni *bundlers*). Consigue esmeraldas picando, compra mejoras que desbloquean otras mejoras y deja que tu mina trabaje sola, incluso cuando no estás.
 
