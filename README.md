@@ -9,8 +9,9 @@ Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft
 *Segunda Mejora apartir de 64 unidades del recurso se desbloquea su mejora correspondiente:*
 
 - [ ] 🪵 **Madera**         -> Cortador             -> Tablones
-- [ ] 🪨 **Piedra**         -> Afilador             -> Coblestone
-- [ ] ⬛ **Carbón**         -> Horno                -> Cobre
+- [ ] 🪨 **Piedra**         -> Afilador             -> Mina
+- [ ] ⬛ **Carbón**         -> Horno                -> Piedra lisa
+- [ ] 🟠 **Copper**         -> Copper Golem (Mina+) -> Cofre de copper (eficacio min+)
 - [ ] ⚪ **Hierro**         -> Armadura             -> Golem de hierro
 - [ ] 🔵 **Lapislázuli**    -> Encantamientos       -> Redstone
 - [ ] 💚 **Esmeralda**      -> Aldeanos             -> Tradeos
