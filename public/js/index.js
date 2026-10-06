@@ -1,13 +1,17 @@
 import { auth, app } from "./firebase.js";
 import {
     createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged,
-    GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail
+    GoogleAuthProvider, signInWithPopup, signInWithRedirect, sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { t, setLang, getLang } from "./i18n.js";
 
-// Analytics es opcional: un bloqueador de anuncios no debe romper el login
-import("https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js")
-    .then(m => m.getAnalytics(app)).catch(() => {});
+
+let consentimiento = false;
+try { consentimiento = localStorage.getItem('analytics-consent') === 'yes'; } catch { /* ignorar */ }
+if (consentimiento) {
+    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js")
+        .then(m => m.getAnalytics(app)).catch(() => {});
+}
 
 const form      = document.getElementById('auth-section');
 const email     = document.getElementById('email');
@@ -23,9 +27,11 @@ const ERRORS = {
     'auth/invalid-email': 'errEmail',
     'auth/weak-password': 'errWeak',
     'auth/network-request-failed': 'errNetwork',
+    'auth/too-many-requests': 'errTooMany',
     'auth/popup-closed-by-user': null,
     'auth/cancelled-popup-request': null,
 };
+const POPUP_FALLBACK = ['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'];
 
 let statusKey = 'checkingSession';
 let isError = false;
@@ -39,23 +45,32 @@ async function run(fn) {
     buttons.forEach(b => b.disabled = true);
     try { await fn(); }
     catch (e) {
-        const key = e.code in ERRORS ? ERRORS[e.code] : 'errGeneric';
+        const key = Object.hasOwn(ERRORS, e?.code) ? ERRORS[e.code] : 'errGeneric';
         if (key) setStatus(key, true);
         else setStatus('loginPrompt');
     } finally { buttons.forEach(b => b.disabled = false); }
 }
 
-// La redirección a game.html la hace SOLO onAuthStateChanged
 form.addEventListener('submit', e => {
     e.preventDefault();
+    password.autocomplete = 'current-password';
     run(() => signInWithEmailAndPassword(auth, email.value, password.value));
 });
 document.getElementById('btn-register').addEventListener('click', () => {
     if (!form.reportValidity()) return;
+    password.autocomplete = 'new-password';
     run(() => createUserWithEmailAndPassword(auth, email.value, password.value));
 });
 document.getElementById('btn-google').addEventListener('click', () => {
-    run(() => signInWithPopup(auth, new GoogleAuthProvider()));
+    run(async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (e) {
+            if (POPUP_FALLBACK.includes(e?.code)) await signInWithRedirect(auth, provider);
+            else throw e;
+        }
+    });
 });
 document.getElementById('btn-reset').addEventListener('click', () => {
     if (!email.value) return setStatus('resetNeedEmail', true);

@@ -11,7 +11,6 @@ body {
 }
 
 h1 {
-    height: clamp(70px, 16vh, 160px);
     margin-bottom: 24px;
 }
 

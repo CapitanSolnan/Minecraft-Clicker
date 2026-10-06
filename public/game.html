@@ -10,7 +10,7 @@
 <body>
 
     <div class="videoborder">
-        <video src="content/img/Video_background.mp4" autoplay loop muted playsinline preload="metadata"></video>
+        <video src="../content/img/Video_background.mp4" autoplay loop muted playsinline preload="metadata"></video>
     </div>
 
     <div class="contenedor">
@@ -21,9 +21,9 @@
             </div>
 
             <div class="lang-switch">
-                <button data-lang="es">ES</button>
-                <button data-lang="ca">CA</button>
-                <button data-lang="en">EN</button>
+                <button type="button" data-lang="es" lang="es" aria-label="Español" aria-pressed="false">ES</button>
+                <button type="button" data-lang="ca" lang="ca" aria-label="Català" aria-pressed="false">CA</button>
+                <button type="button" data-lang="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
             </div>
 
             <div></div>
@@ -50,7 +50,6 @@
         </div>
     </div>
 
-    <script type="module" src="js/i18n.js"></script>
     <script type="module" src="js/game.js"></script>
 </body>
 </html>

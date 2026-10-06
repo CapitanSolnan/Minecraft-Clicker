@@ -1,15 +1,24 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { auth, db } from "./firebase.js";
 import { t, tItem, setLang, getLang } from "./i18n.js";
 
 // ── Configuración
-const CRECIMIENTO = 1.15; 
+const CRECIMIENTO = 1.15;
 const MAX_OFFLINE_S = 8 * 3600;
 const AUTOSAVE_MS = 60 * 1000;
+const TICK_MS = 250;
+const MAX_TICK_S = 5;
+const STATUS_MS = 3000;
+const RETRY_MS = 5000;
+const SALIDA_DEBOUNCE_MS = 2000;
+const RESPALDO_MS = 10 * 1000;
+const UNIDADES_DESBLOQUEO = 10;
+const MAX_CANTIDAD = 1000;
+const LS_PREFIX = 'mc-clicker-save-';
 
 const MEJORAS = [
-    { id: 'tronco',    costeBase: 10,            clickBonus: 1,   pasivo: 0,      desbloquea: 'piedra',    oculto: false },
+    { id: 'tronco',    costeBase: 10,            clickBonus: 1,   pasivo: 0,      desbloquea: 'piedra' },
     { id: 'piedra',    costeBase: 100,           clickBonus: 5,   pasivo: 0,      desbloquea: 'carbon' },
     { id: 'carbon',    costeBase: 1_000,         clickBonus: 5,   pasivo: 2,      desbloquea: 'hierro' },
     { id: 'hierro',    costeBase: 50_000,        clickBonus: 10,  pasivo: 10,     desbloquea: 'lapiz' },
@@ -19,7 +28,7 @@ const MEJORAS = [
     { id: 'diamante',  costeBase: 500_000_000,   clickBonus: 250, pasivo: 6_250,  desbloquea: 'obsidiana' },
     { id: 'obsidiana', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea: null },
 ];
-MEJORAS.forEach(m => { m.oculto = m.oculto !== false; });
+MEJORAS.forEach((m, i) => { m.oculto = i > 0; });
 
 // ── Estado
 let contador = 0;
@@ -44,7 +53,6 @@ function formatear(n) {
     if (v >= 1000 && i < SUFIJOS.length - 1) { v = Math.floor(v / 1000 * 100) / 100; i++; }
     return signo + new Intl.NumberFormat(getLang(), { maximumFractionDigits: 2 }).format(v) + SUFIJOS[i];
 }
-// Formato timer 
 function formatearTiempo(s) {
     s = Math.floor(s);
     const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, seg = s % 60;
@@ -54,8 +62,18 @@ function formatearTiempo(s) {
     return seg + 's';
 }
 
-// ── Generar slots desde MEJORAS
+const setText = (el, txt) => { if (el.textContent !== txt) el.textContent = txt; };
+const setDisabled = (el, v) => { if (el.disabled !== v) el.disabled = v; };
+
+const elContador = document.getElementById('contador');
+const elXseg     = document.getElementById('xseg');
+const elTimer    = document.getElementById('timer-value');
+const elStatus   = document.getElementById('save-status');
+const btnGuardar = document.getElementById('guardar');
+const btnLogout  = document.getElementById('logout');
+
 const grid = document.getElementById('inv-grid');
+const refs = {};
 MEJORAS.forEach(m => {
     const icono = m.id[0].toUpperCase() + m.id.slice(1);
     const slot = document.createElement('div');
@@ -63,31 +81,33 @@ MEJORAS.forEach(m => {
     slot.id = 'mej-' + m.id;
     const iconoUrl = new URL(`content/img/minecraft_icons/${icono}.png`, document.baseURI).href;
     slot.style.setProperty('--icon', `url("${iconoUrl}")`);
-    slot.innerHTML = `<span id="text-${m.id}"></span>
-        <button id="Comprar-${m.id}"></button>
-        <button id="Vender-${m.id}"></button>`;
+
+    const texto = document.createElement('span');
+    const bComprar = document.createElement('button');
+    const bVender = document.createElement('button');
+    bComprar.type = bVender.type = 'button';
+    slot.append(texto, bComprar, bVender);
     grid.appendChild(slot);
-    slot.querySelector('#Comprar-' + m.id).addEventListener('click', () => comprar(m));
-    slot.querySelector('#Vender-' + m.id).addEventListener('click', () => vender(m));
+
+    bComprar.addEventListener('click', () => comprar(m));
+    bVender.addEventListener('click', () => vender(m));
+    refs[m.id] = { slot, texto, bComprar, bVender };
 });
 
-// ── Renderizado
 function actualizarUI() {
-    document.getElementById('contador').textContent = formatear(contador) + ' ' + t('emeralds');
-    document.getElementById('xseg').textContent =
-        formatear(calcularPasivo()) + ' ' + t('perSec') + '  |  +' + formatear(1 + calcularBonusClick()) + ' ' + t('perClick');
-    document.getElementById('timer-value').textContent = formatearTiempo(timer);
+    setText(elContador, formatear(contador) + ' ' + t('emeralds'));
+    setText(elXseg, formatear(calcularPasivo()) + ' ' + t('perSec') + '  |  +' + formatear(1 + calcularBonusClick()) + ' ' + t('perClick'));
+    setText(elTimer, formatearTiempo(timer));
 }
 
 function actualizarMejoraUI(m) {
-    const e = estado[m.id];
-    document.getElementById('text-' + m.id).textContent = t('upgradeOf', { n: e.cantidad, name: tItem(m.id) });
-    const comprar = document.getElementById('Comprar-' + m.id);
-    const vender  = document.getElementById('Vender-' + m.id);
-    comprar.textContent = t('buyFor', { price: formatear(costeDe(m)) + ' $' });
-    vender.textContent  = t('sellFor', { price: formatear(e.cantidad ? ventaDe(m) : 0) + ' $' });
-    comprar.disabled = contador < costeDe(m);
-    vender.disabled  = e.cantidad < 1;
+    const e = estado[m.id], r = refs[m.id];
+    const maximo = e.cantidad >= MAX_CANTIDAD;
+    setText(r.texto, t('upgradeOf', { n: e.cantidad, name: tItem(m.id) }));
+    setText(r.bComprar, t('buyFor', { price: formatear(costeDe(m)) + ' $' }));
+    setText(r.bVender, t('sellFor', { price: formatear(e.cantidad ? ventaDe(m) : 0) + ' $' }));
+    setDisabled(r.bComprar, !cargado || maximo || contador < costeDe(m));
+    setDisabled(r.bVender, !cargado || e.cantidad < 1);
 }
 
 function renderTodo() {
@@ -96,23 +116,24 @@ function renderTodo() {
 }
 
 function desbloquearMejora(id) {
-    if (!id) return;
+    if (!id || !estado[id]) return;
     estado[id].desbloqueada = true;
-    document.getElementById('mej-' + id).classList.remove('locked');
+    refs[id].slot.classList.remove('locked');
 }
 
-// ── Compra / venta
 function comprar(m) {
+    if (!cargado) return;
     const e = estado[m.id];
     const coste = costeDe(m);
-    if (contador < coste) return;
+    if (contador < coste || e.cantidad >= MAX_CANTIDAD) return;
     contador -= coste;
     e.cantidad++;
-    if (e.cantidad >= 10) desbloquearMejora(m.desbloquea);
+    if (e.cantidad >= UNIDADES_DESBLOQUEO) desbloquearMejora(m.desbloquea);
     renderTodo();
 }
 
 function vender(m) {
+    if (!cargado) return;
     const e = estado[m.id];
     if (e.cantidad < 1) return;
     contador += ventaDe(m);
@@ -120,40 +141,42 @@ function vender(m) {
     renderTodo();
 }
 
-// ── Click manual
-document.getElementById('click').addEventListener('click', function (ev) {
-    const ganancia = 1 + calcularBonusClick();
-    contador += ganancia;
-
-
+document.getElementById('click').addEventListener('click', () => {
+    if (!cargado) return;
+    contador += 1 + calcularBonusClick();
     renderTodo();
 });
 
-// ── Tick con delta de tiempo real
 let ultimo = Date.now();
-function avanzar(segundos) {
-    timer += segundos;
+function avanzar(segundos, contarTimer = true) {
+    if (contarTimer) timer += segundos;
     contador += calcularPasivo() * segundos;
 }
 setInterval(() => {
     const ahora = Date.now();
-    avanzar(Math.min((ahora - ultimo) / 1000, MAX_OFFLINE_S));
+    const delta = Math.max(0, (ahora - ultimo) / 1000);
     ultimo = ahora;
-    renderTodo();
-}, 250);
+    if (!cargado) return;
+    avanzar(Math.min(delta, MAX_OFFLINE_S), delta <= MAX_TICK_S);
+    if (!document.hidden) renderTodo();
+}, TICK_MS);
 
-// ══════════ Guardado en Firestore ══════════
+// ══════════ Guardado ══════════
 let uid = null;
 let cargado = false;
-let guardando = false;
+let bloqueado = false;
+let version = 0;
+let guardandoP = null;
+let ultimoGuardado = 0;
 let statusTimeout;
 
-function mostrarEstado(key, params) {
-    const el = document.getElementById('save-status');
-    el.textContent = t(key, params);
+function mostrarEstado(key, params, fijo = false) {
+    setText(elStatus, t(key, params));
     clearTimeout(statusTimeout);
-    statusTimeout = setTimeout(() => { el.textContent = ''; }, 3000);
+    if (!fijo) statusTimeout = setTimeout(() => { elStatus.textContent = ''; }, STATUS_MS);
 }
+
+const num = (v, def = 0) => { v = Number(v); return Number.isFinite(v) ? v : def; };
 
 function crearSave() {
     const save = { contador, timer, lastSeen: Date.now(), estado: {} };
@@ -164,72 +187,147 @@ function crearSave() {
 }
 
 function aplicarSave(save) {
-    contador = Number(save.contador) || 0;
-    timer    = Number(save.timer) || 0;
+    contador = Math.max(0, num(save.contador));
+    timer    = Math.max(0, num(save.timer));
     MEJORAS.forEach(m => {
         const s = save.estado && save.estado[m.id];
         if (!s) return;
-        estado[m.id].cantidad = Math.max(0, Number(s.cantidad) || 0);
+        estado[m.id].cantidad = Math.min(MAX_CANTIDAD, Math.max(0, Math.floor(num(s.cantidad))));
         if (s.desbloqueada || !m.oculto) desbloquearMejora(m.id);
     });
+    MEJORAS.forEach(m => { if (estado[m.id].cantidad >= UNIDADES_DESBLOQUEO) desbloquearMejora(m.desbloquea); });
 
     // Progreso offline
-    const lejos = Math.min(Math.max((Date.now() - (Number(save.lastSeen) || Date.now())) / 1000, 0), MAX_OFFLINE_S);
+    const lejos = Math.min(Math.max((Date.now() - num(save.lastSeen, Date.now())) / 1000, 0), MAX_OFFLINE_S);
     const antes = contador;
-    avanzar(lejos);
+    avanzar(lejos, false);
     ultimo = Date.now();
-    renderTodo();
     return contador - antes;
+}
+
+function respaldoLocal() {
+    if (!uid || !cargado) return;
+    try { localStorage.setItem(LS_PREFIX + uid, JSON.stringify({ ...crearSave(), version })); } catch { /* ignorar */ }
+}
+function leerRespaldo() {
+    try { return JSON.parse(localStorage.getItem(LS_PREFIX + uid)); } catch { return null; }
 }
 
 async function cargarNube() {
     try {
         const snap = await getDoc(doc(db, 'saves', uid));
-        if (!snap.exists()) { mostrarEstado('noSave'); return 'nosave'; }
-        const ganado = aplicarSave(snap.data());
+        const remoto = snap.exists() ? snap.data() : null;
+        version = remoto ? num(remoto.version) : 0;
+
+        const local = leerRespaldo();
+        const usarLocal = local && num(local.version) >= version && (!remoto || num(local.lastSeen) > num(remoto.lastSeen));
+        const save = usarLocal ? local : remoto;
+
+        if (!save) { ultimo = Date.now(); mostrarEstado('noSave'); return 'nosave'; }
+        cargado = true;
+        const ganado = aplicarSave(save);
+        renderTodo();
         if (ganado >= 1) mostrarEstado('offlineGain', { n: formatear(ganado) });
         else mostrarEstado('loaded');
         return 'loaded';
     } catch (err) {
         console.error('Error al cargar:', err);
-        mostrarEstado('loadError');
         return 'error';
     }
 }
 
-async function guardarNube(auto) {
-    if (!uid || !cargado) { mostrarEstado('loading'); return; }
-    if (guardando) return;
-    guardando = true;
-    try {
-        await setDoc(doc(db, 'saves', uid), { ...crearSave(), updatedAt: serverTimestamp() });
-        mostrarEstado(auto ? 'autosaved' : 'saved');
-    } catch (err) {
-        console.error('Error al guardar:', err);
-        mostrarEstado('saveError');
-    } finally { guardando = false; }
+async function cargarConReintentos() {
+    mostrarEstado('loading', undefined, true);
+    while (true) {
+        const r = await cargarNube();
+        if (r !== 'error') break;
+        mostrarEstado('loadError', undefined, true);
+        await new Promise(res => setTimeout(res, RETRY_MS));
+    }
+    cargado = true;
+    renderTodo();
 }
 
-document.getElementById('guardar').addEventListener('click', () => guardarNube(false));
-document.getElementById('logout').addEventListener('click', async () => {
-    await guardarNube(true);
+function guardarNube(auto) {
+    if (!uid || !cargado || bloqueado) {
+        if (!cargado && !auto) mostrarEstado('loading');
+        return Promise.resolve(false);
+    }
+    if (guardandoP) return auto ? guardandoP : guardandoP.then(() => guardarNube(auto));
+
+    ultimoGuardado = Date.now();
+    guardandoP = (async () => {
+        try {
+            const ref = doc(db, 'saves', uid);
+            const nuevaVersion = await runTransaction(db, async tx => {
+                const snap = await tx.get(ref);
+                const remota = snap.exists() ? num(snap.data().version) : 0;
+                if (remota !== version) {
+                    const err = new Error('conflict');
+                    err.code = 'app/conflict';
+                    throw err;
+                }
+                tx.set(ref, { ...crearSave(), version: remota + 1, updatedAt: serverTimestamp() });
+                return remota + 1;
+            });
+            version = nuevaVersion;
+            mostrarEstado(auto ? 'autosaved' : 'saved');
+            return true;
+        } catch (err) {
+            if (err.code === 'app/conflict') {
+                bloqueado = true;
+                mostrarEstado('conflict', undefined, true);
+            } else {
+                console.error('Error al guardar:', err);
+                mostrarEstado('saveError');
+            }
+            return false;
+        } finally {
+            guardandoP = null;
+        }
+    })();
+    return guardandoP;
+}
+
+btnGuardar.addEventListener('click', () => guardarNube(false));
+
+btnLogout.addEventListener('click', async () => {
+    btnLogout.disabled = btnGuardar.disabled = true;
+    const ok = await guardarNube(false);
+    if (!ok && !confirm(t('leaveUnsaved'))) {
+        btnLogout.disabled = btnGuardar.disabled = false;
+        return;
+    }
+    respaldoLocal();
     await signOut(auth);
 });
 
-// ── Idioma
 document.querySelectorAll('[data-lang]').forEach(btn => {
     btn.addEventListener('click', () => setLang(btn.dataset.lang, renderTodo));
 });
 setLang(getLang(), renderTodo);
 
-// ── Sesión
+let iniciado = false;
+function iniciarSesion() {
+    setInterval(() => guardarNube(true), AUTOSAVE_MS);
+    setInterval(respaldoLocal, RESPALDO_MS);
+
+    const salir = () => {
+        respaldoLocal();
+        if (Date.now() - ultimoGuardado > SALIDA_DEBOUNCE_MS) guardarNube(true);
+    };
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') salir();
+        else renderTodo();
+    });
+    window.addEventListener('pagehide', salir);
+}
+
 onAuthStateChanged(auth, async user => {
     if (!user) { window.location.href = 'index.html'; return; }
+    if (iniciado) return;
+    iniciado = true;
     uid = user.uid;
-    cargado = (await cargarNube()) !== 'error';
-
-    setInterval(() => guardarNube(true), AUTOSAVE_MS);
-    const guardarAlSalir = () => { if (document.visibilityState === 'hidden') guardarNube(true); };
-    document.addEventListener('visibilitychange', guardarAlSalir);
-    window.addEventListener('pagehide', () => guardarNube(true));
+    await cargarConReintentos();
+    iniciarSesion();
 }, console.error);

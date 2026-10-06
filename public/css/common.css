@@ -1,13 +1,14 @@
 @font-face {
     font-family: "Minecraft";
-    src: url(../content/Minecraft.woff);
+    src: url("../content/Minecraft.woff") format("woff");
+    font-display: swap;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Minecraft";
+    font-family: "Minecraft", monospace;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -34,7 +35,7 @@ video {
 }
 
 h1 {
-    height: 160px;
+    height: clamp(70px, 16vh, 160px);
     background: url('../content/img/minecraft_title.png') no-repeat center/contain;
 }
 
@@ -67,7 +68,8 @@ h1 {
     padding: 4px 10px;
 }
 
-.lang-switch button.active {
+.lang-switch button.active,
+.lang-switch button[aria-pressed="true"] {
     font-weight: bold;
     outline: 2px solid #fff;
 }
