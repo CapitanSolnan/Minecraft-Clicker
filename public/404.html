@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>404 · Bloque no encontrado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cielo: #1b1230;
+    --tierra: #7a5230;
+    --tierra-osc: #5a3b22;
+    --hierba: #5d9b3a;
+    --hierba-osc: #447a28;
+    --piedra: #8b8b8b;
+    --texto: #f2ede4;
+    --apagado: #b9b0c9;
+    --esmeralda: #3ddc84;
+    --pixel: 8px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--cielo);
+    color: var(--texto);
+    font-family: "Press Start 2P", "Courier New", monospace;
+    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px 20px 16px;
+    gap: 28px;
+  }
+
+  .numero {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: center;
+  }
+  .glifo {
+    display: grid;
+    grid-template-columns: repeat(5, var(--pixel));
+    grid-auto-rows: var(--pixel);
+    gap: 0;
+  }
+  .glifo i { display: block; }
+  .glifo i.on {
+    background: var(--esmeralda);
+    box-shadow: inset -2px -2px 0 #1f9a57, inset 2px 2px 0 #8dffc0;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(14px, 3.4vw, 22px);
+    font-weight: 400;
+  }
+  p {
+    margin: 0;
+    max-width: 46ch;
+    font-size: clamp(9px, 2vw, 11px);
+    color: var(--apagado);
+  }
+
+  .acciones { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn {
+    font: inherit;
+    font-size: 11px;
+    color: var(--texto);
+    text-decoration: none;
+    background: #6d6d6d;
+    padding: 14px 20px;
+    border: 3px solid #000;
+    box-shadow: inset -4px -4px 0 #3a3a3a, inset 4px 4px 0 #a8a8a8;
+    cursor: pointer;
+  }
+  .btn:hover { background: #7e8fc4; box-shadow: inset -4px -4px 0 #4a5a8a, inset 4px 4px 0 #b4c2ee; }
+  .btn:active { transform: translateY(2px); }
+  .btn:focus-visible { outline: 3px solid var(--esmeralda); outline-offset: 3px; }
+
+  .suelo { width: 100%; image-rendering: pixelated; }
+  .hierba {
+    height: 24px;
+    background:
+      repeating-linear-gradient(90deg, var(--hierba) 0 24px, var(--hierba-osc) 24px 48px);
+    border-top: 6px solid #7bc24f;
+  }
+  .tierra {
+    height: 64px;
+    background:
+      repeating-linear-gradient(90deg, var(--tierra) 0 32px, var(--tierra-osc) 32px 64px),
+      var(--tierra);
+    background-blend-mode: normal;
+    position: relative;
+  }
+  .tierra::after {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(var(--tierra-osc), var(--tierra-osc)) 40px 16px / 8px 8px no-repeat,
+      linear-gradient(var(--piedra), var(--piedra)) 140px 32px / 16px 8px no-repeat,
+      linear-gradient(var(--tierra-osc), var(--tierra-osc)) 260px 8px / 8px 16px no-repeat,
+      linear-gradient(var(--piedra), var(--piedra)) 380px 28px / 8px 8px no-repeat,
+      linear-gradient(var(--tierra-osc), var(--tierra-osc)) 520px 20px / 16px 8px no-repeat;
+    opacity: .9;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .numero { animation: caer .7s cubic-bezier(.3, 1.4, .5, 1) both; }
+    @keyframes caer {
+      from { transform: translateY(-60vh); }
+      to   { transform: translateY(0); }
+    }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="numero" id="numero" role="img" aria-label="404"></div>
+
+  <h1 id="titulo">Bloque no encontrado</h1>
+  <p id="texto">Esta página no existe o se ha roto. Vuelve a la mina y sigue minando esmeraldas.</p>
+
+  <div class="acciones">
+    <a class="btn" id="volver" href="index.html">Volver al juego</a>
+    <button class="btn" id="atras" type="button">Página anterior</button>
+  </div>
+</main>
+
+<div class="suelo">
+  <div class="hierba"></div>
+  <div class="tierra"></div>
+</div>
+
+<script>
+  const GLIFOS = {
+    '4': ['00010','00110','01010','10010','11111','00010','00010'],
+    '0': ['01110','10001','10011','10101','11001','10001','01110']
+  };
+  const cont = document.getElementById('numero');
+  '404'.split('').forEach(ch => {
+    const g = document.createElement('div');
+    g.className = 'glifo';
+    GLIFOS[ch].forEach(fila => [...fila].forEach(c => {
+      const i = document.createElement('i');
+      if (c === '1') i.className = 'on';
+      g.appendChild(i);
+    }));
+    cont.appendChild(g);
+  });
+
+  const TEXTOS = {
+    es: {
+      title: '404 · Bloque no encontrado',
+      titulo: 'Bloque no encontrado',
+      texto: 'Esta página no existe o se ha roto. Vuelve a la mina y sigue minando esmeraldas.',
+      volver: 'Volver al juego',
+      atras: 'Página anterior'
+    },
+    en: {
+      title: '404 · Block not found',
+      titulo: 'Block not found',
+      texto: 'This page does not exist or was broken. Head back to the mine and keep collecting emeralds.',
+      volver: 'Back to the game',
+      atras: 'Previous page'
+    }
+  };
+  const lang = (navigator.language || 'es').toLowerCase().startsWith('en') ? 'en' : 'es';
+  const T = TEXTOS[lang];
+  document.documentElement.lang = lang;
+  document.title = T.title;
+  ['titulo', 'texto', 'volver', 'atras'].forEach(id => { document.getElementById(id).textContent = T[id]; });
+
+  const atras = document.getElementById('atras');
+  if (history.length > 1) atras.addEventListener('click', () => history.back());
+  else atras.hidden = true;
+</script>
+</body>
+</html>

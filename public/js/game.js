@@ -17,6 +17,10 @@ const SALIDA_DEBOUNCE_MS = 2000;
 const RESPALDO_MS = 10 * 1000;
 const LS_PREFIX = 'mc-clicker-save-';
 
+const ICONO_BASE = 'content/img/minecraft_icons/';
+const ICONO_FALLBACK = new URL(ICONO_BASE + 'No-texture.png', document.baseURI).href;
+const cssUrl = u => `url("${u}")`;
+
 let contador = 0;
 let timer = 0;
 const estado = {};
@@ -46,8 +50,13 @@ MEJORAS.forEach(m => {
     const slot = document.createElement('div');
     slot.className = 'slot' + (m.oculto ? ' locked' : '');
     slot.id = 'mej-' + m.id;
-    const iconoUrl = new URL(`content/img/minecraft_icons/${icono}.png`, document.baseURI).href;
-    slot.style.setProperty('--icon', `url("${iconoUrl}")`);
+
+    const iconoUrl = new URL(`${ICONO_BASE}${icono}.png`, document.baseURI).href;
+    slot.style.setProperty('--icon', cssUrl(iconoUrl));
+
+    const sonda = new Image();
+    sonda.onerror = () => slot.style.setProperty('--icon', cssUrl(ICONO_FALLBACK));
+    sonda.src = iconoUrl;
 
     const texto = document.createElement('span');
     const bComprar = document.createElement('button');
