@@ -53,6 +53,15 @@ h1 {
     border-radius: 8px;
 }
 
+/* ESTADO DE GUARDADO */
+.save-status {
+    position: absolute;
+    top: 55px;
+    left: 10px;
+    color: white;
+    text-shadow: 2px 2px black;
+}
+
 /* CLICK */
 .contenedor2 {
     position: absolute;

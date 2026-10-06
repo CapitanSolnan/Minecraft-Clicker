@@ -1,3 +1,21 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3YYcsHk3ceduiWPOBm6oJZBp_ZiArYsg",
+  authDomain: "minecraft-clicker-3cd9b.firebaseapp.com",
+  projectId: "minecraft-clicker-3cd9b",
+  storageBucket: "minecraft-clicker-3cd9b.firebasestorage.app",
+  messagingSenderId: "308705407124",
+  appId: "1:308705407124:web:6fb19ff52073f2db788481",
+  measurementId: "G-VKGX649NEW"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
 // ── Estado global
 let contador = 0;
 let timer = 0;
@@ -245,62 +263,120 @@ setInterval(function() {
     });
 }, 1000);
 
-// ── Guardar progreso
-document.querySelector('.guardar').addEventListener('click', function() {
-    var save = { contador: contador, timer: timer, estado: {} };
+// ══════════════════════════════════════════════
+//  GUARDADO EN FIREBASE (Firestore)
+// ══════════════════════════════════════════════
+const AUTOSAVE_MS = 5 * 60 * 1000;
+let uid = null;
+let cargado = false;
+let autosaveIniciado = false;
+let statusTimeout;
+
+function mostrarEstado(msg) {
+    const el = document.getElementById('save-status');
+    el.textContent = msg;
+    clearTimeout(statusTimeout);
+    statusTimeout = setTimeout(function() { el.textContent = ''; }, 3000);
+}
+
+function crearSave() {
+    const save = { contador: contador, timer: timer, estado: {} };
     MEJORAS.forEach(function(m) {
+        const e = estado[m.id];
         save.estado[m.id] = {
-            cantidad:     estado[m.id].cantidad,
-            coste:        estado[m.id].coste,
-            venta:        estado[m.id].venta,
-            desbloqueada: estado[m.id].desbloqueada,
+            cantidad:     e.cantidad,
+            coste:        e.coste,
+            venta:        e.venta,
+            desbloqueada: e.desbloqueada,
         };
     });
+    return save;
+}
 
-    var blob = new Blob([JSON.stringify(save)], { type: 'text/plain;charset=utf-8' });
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href     = url;
-    a.download = 'gameProgress.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+function aplicarSave(save) {
+    contador = Number(save.contador) || 0;
+    timer    = Number(save.timer)    || 0;
+
+    MEJORAS.forEach(function(m) {
+        const s = save.estado && save.estado[m.id];
+        const e = estado[m.id];
+        if (s) {
+            e.cantidad = s.cantidad;
+            e.coste    = s.coste;
+            e.venta    = s.venta;
+            e.desbloqueada = !m.oculto;
+            if (s.desbloqueada) {
+                desbloquearMejora(m.id);
+            } else if (m.oculto) {
+                document.querySelector('.mej-' + m.id).style.display = 'none';
+            }
+        }
+        actualizarMejoraUI(m);
+    });
+
+    document.getElementById('timer').innerHTML = 'Tiempo transcurrido: ' + timer;
+    actualizarUI();
+}
+
+async function guardarNube(auto) {
+    if (!uid || !cargado) {
+        mostrarEstado('Espera, cargando partida...');
+        return;
+    }
+    try {
+        await setDoc(doc(db, 'saves', uid), Object.assign(crearSave(), {
+            updatedAt: serverTimestamp(),
+        }));
+        mostrarEstado(auto ? 'Autoguardado ✔' : 'Partida guardada ✔');
+    } catch (err) {
+        console.error('Error al guardar:', err);
+        mostrarEstado('Error al guardar ✖');
+    }
+}
+
+async function cargarNube() {
+    try {
+        const snap = await getDoc(doc(db, 'saves', uid));
+        if (snap.exists()) {
+            aplicarSave(snap.data());
+            mostrarEstado('Partida cargada ✔');
+            return true;
+        }
+        mostrarEstado('No hay partida guardada');
+    } catch (err) {
+        console.error('Error al cargar:', err);
+        mostrarEstado('Error al cargar ✖');
+    }
+    return false;
+}
+
+// ── Botones
+document.getElementById('guardar').addEventListener('click', function() {
+    guardarNube(false);
 });
 
-// ── Cargar progreso
-document.querySelector('.cargar').addEventListener('change', function(event) {
-    var file = event.target.files[0];
-    if (!file) return;
+document.getElementById('cargar').addEventListener('click', async function() {
+    if (!uid) return;
+    if (confirm('¿Cargar la partida guardada? Se perderá el progreso actual.')) {
+        await cargarNube();
+    }
+});
 
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            var save = JSON.parse(e.target.result);
+onAuthStateChanged(auth, async function(user) {
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+    uid = user.uid;
+    await cargarNube();
+    cargado = true;
 
-            contador = save.contador || 0;
-            timer    = save.timer    || 0;
+    if (!autosaveIniciado) {
+        autosaveIniciado = true;
+        setInterval(function() { guardarNube(true); }, AUTOSAVE_MS);
 
-            if (save.estado) {
-                MEJORAS.forEach(function(m) {
-                    if (save.estado[m.id]) {
-                        estado[m.id].cantidad     = save.estado[m.id].cantidad;
-                        estado[m.id].coste        = save.estado[m.id].coste;
-                        estado[m.id].venta        = save.estado[m.id].venta;
-                        estado[m.id].desbloqueada = save.estado[m.id].desbloqueada;
-                    }
-                });
-            } 
-
-            MEJORAS.forEach(function(m) {
-                if (estado[m.id].desbloqueada) desbloquearMejora(m.id);
-                actualizarMejoraUI(m);
-            });
-            actualizarUI();
-
-        } catch (err) {
-            console.error('Error al cargar el progreso:', err);
-        }
-    };
-    reader.readAsText(file);
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') guardarNube(true);
+        });
+    }
 });

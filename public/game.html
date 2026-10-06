@@ -20,12 +20,13 @@
 
         <!-- TIMER -->
         <div class="timer" id="timer">Tiempo transcurrido: 0</div>
+        <div class="save-status" id="save-status"></div>
 
         <!-- GUARDAR / CARGAR -->
         <p class="div-cargar">Cargar Progreso</p>
         <button class="guardar" id="guardar">Guardar Progreso</button>
         <p class="div-guardar">Guardar Progreso</p>
-        <input type="file" onchange="onChange(event)" class="cargar" id="cargar">
+        <button class="cargar" id="cargar">Cargar Progreso</button>
 
         <!-- ZONA CLICK -->
         <div class="contenedor2">
@@ -99,6 +100,6 @@
 
     </div>
 
-    <script src="js/game.js"></script>
+    <script type="module" src="js/game.js"></script>
 </body>
 </html>
