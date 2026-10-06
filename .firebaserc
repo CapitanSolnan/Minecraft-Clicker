@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "minecraft-clicker-3cd9b"
-  }
+  },
+  "targets": {
+    "minecraft-clicker-3cd9b": {
+      "hosting": {
+        "minecraft-game": [
+          "minecraft-clicker-game"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

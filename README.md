@@ -1,30 +1,49 @@
-"# Minecraft-Clicker" 
-MEJORAS PARA EL CLICKER
-NUEVO TIPO DE MEJORA (AFILADOR/CORTADOR/ENCANTAMIENTOS...)
-FONDO DE PANTALLA
-MEJORAR LOS NUMEROS DEL TIMER Y DE LOS PRECIOS
-CADA 64 DE CADA COSA SE PUEDE COMPRAR UNA MEJORA PARA ESOS 64 -
--MADERA 	-> CORTADOR 
--PIEDRA 	-> AFILADOR
--CARBON 	-> HORNO
--COBRE		-> ARMOR SLOT	
--HIERRO 	-> ARMADURA
--Lapizlaz 	-> ENCANTAMIENTOS
--Redstone	-> POTIS
--ESMERALDA 	-> ALDEANOS
--Diamante 	-> MEJORA DE ARMADURA
--Obsidiana	-> NETHER
+# ⛏️ Minecraft-Clicker - TODO & Roadmap
 
-NETHER 
--CUARZO		-> ORO
--ORO		-> GRANJA DE PIGLINS
--FRAG DE NETHERITE -> HERRERIA
--ORO + FRAG NETHER -> NETHERITE
--NETHERITE	-> MEJORA DE ARMADURA
--BLAZE		-> POLVO DE BRAZE
--ENDERPEARL + POLVO DE BRAZE -> END
+Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft-Clicker**.
 
-END
--End cristal -> huevo de dragona
--frag de shulker -> shulker
--ELITRas -> FINAL
+---
+
+## 🎨 Interfaz y Visuales
+- [ ] Implementar **Fondo de pantalla** dinámico
+- [ ] Mejorar el formato de los **números del timer y de los precios** (legibilidad)
+- [ ] Cuadrar las cosas
+- [ ] Cambiar el timer
+
+---
+
+## 🌍 Overworld (Sistema de 64 unidades)
+*Primera Mejora apartir de 32 unidades del recurso se desbloquea su mejora correspondiente:*
+*Segunda Mejora apartir de 64 unidades del recurso se desbloquea su mejora correspondiente:*
+
+- [ ] 🪵 **Madera**         -> Cortador             -> Tablones
+- [ ] 🪨 **Piedra**         -> Afilador             -> Coblestone
+- [ ] ⬛ **Carbón**         -> Horno                -> Cobre
+- [ ] ⚪ **Hierro**         -> Armadura             -> Golem de hierro
+- [ ] 🔵 **Lapislázuli**    -> Encantamientos       -> Redstone
+- [ ] 💚 **Esmeralda**      -> Aldeanos             -> Tradeos
+- [ ] 💎 **Diamante**       -> Mejora de Armadura   -> Pico de diamante
+- [ ] 🟪 **Obsidiana**      -> Nether
+
+---
+*Falta Pensarlo Mejor*
+## 🔥 The Nether
+- [ ] ✨ **Cuarzo**         -> Oro
+- [ ] 🟡 **Oro**            -> Granja de Piglins
+- [ ] 🧱 **Frag. de Nethe** -> Herrería
+- [ ] **Oro + Frag Nether**  -> Netherite
+- [ ] 🛡️ **Netherite**      -> Mejora de Armadura
+- [ ] 🔥 **Blaze**          -> Polvo de Blaze
+- [ ] 🔮 + 🔥 **Enderpearl + Polvo de Blaze** -> End
+
+---
+*Falta Pensarlo Mejor*
+## 🌌 The End
+- [ ] 🟣 **End Crystal** -> Huevo de dragona
+- [ ] 📦 **Frag. de shulker** -> Shulker
+- [ ] 🪽 **Élitras** -> Final
+
+## Traduccion
+- [ ] Ingles
+- [ ] Catalan
+- [ ] Más...
