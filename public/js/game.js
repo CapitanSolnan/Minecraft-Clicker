@@ -370,7 +370,6 @@ onAuthStateChanged(auth, async function(user) {
         autosaveIniciado = true;
         setInterval(function() { guardarNube(true); }, AUTOSAVE_MS);
 
-        // intento extra al ocultar/cerrar la pestaña
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'hidden') guardarNube(true);
         });
