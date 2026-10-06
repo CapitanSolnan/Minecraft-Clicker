@@ -17,16 +17,49 @@ const UNIDADES_DESBLOQUEO = 10;
 const MAX_CANTIDAD = 1000;
 const LS_PREFIX = 'mc-clicker-save-';
 
+
+//Desbloquea1 -> 10
+//Desbloquea2 -> 32
+//Desbloquea3 -> 64
 const MEJORAS = [
-    { id: 'tronco',    costeBase: 10,            clickBonus: 1,   pasivo: 0,      desbloquea: 'piedra' },
-    { id: 'piedra',    costeBase: 100,           clickBonus: 5,   pasivo: 0,      desbloquea: 'carbon' },
-    { id: 'carbon',    costeBase: 1_000,         clickBonus: 5,   pasivo: 2,      desbloquea: 'hierro' },
-    { id: 'hierro',    costeBase: 50_000,        clickBonus: 10,  pasivo: 10,     desbloquea: 'lapiz' },
-    { id: 'lapiz',     costeBase: 500_000,       clickBonus: 10,  pasivo: 50,     desbloquea: 'redstone' },
-    { id: 'redstone',  costeBase: 5_000_000,     clickBonus: 50,  pasivo: 250,    desbloquea: 'oro' },
-    { id: 'oro',       costeBase: 50_000_000,    clickBonus: 50,  pasivo: 1_250,  desbloquea: 'diamante' },
-    { id: 'diamante',  costeBase: 500_000_000,   clickBonus: 250, pasivo: 6_250,  desbloquea: 'obsidiana' },
-    { id: 'obsidiana', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea: null },
+    { id: 'tronco',    costeBase: 10,            clickBonus: 1,   pasivo: 0,      desbloquea1: 'piedra',     desbloquea2: 'cortador',  desbloquea3: 'tablones'},
+    { id: 'cortador',  costeBase: 50,            clickBonus: 1,   pasivo: 0},
+    { id: 'tablones',  costeBase: 50,            clickBonus: 1,   pasivo: 0},
+
+    { id: 'piedra',    costeBase: 100,           clickBonus: 5,   pasivo: 0,      desbloquea1: 'carbon',     desbloquea2: 'afilador', desbloquea3: 'mina' },
+    { id: 'afilador',  costeBase: 500,           clickBonus: 5,   pasivo: 0},
+    { id: 'mina',      costeBase: 500,           clickBonus: 5,   pasivo: 0},
+
+    { id: 'carbon',    costeBase: 1_000,         clickBonus: 5,   pasivo: 2,      desbloquea1: 'cobre',      desbloquea2: 'horno', desbloquea3: 'piedra_lisa'  },
+    { id: 'horno',      costeBase: 5_000,        clickBonus: 5,   pasivo: 10},
+    { id: 'piedra_lisa', costeBase: 5_000,       clickBonus: 5,   pasivo: 10},
+
+    { id: 'cobre',     costeBase: 10_000,        clickBonus: 10,  pasivo: 10,     desbloquea1: 'hierro',     desbloquea2: 'copper_golem', desbloquea3: 'copper_chest' },
+    {id: 'copper_golem', costeBase: 50_000,      clickBonus: 10,  pasivo: 10},
+    {id: 'copper_chest', costeBase: 50_000,      clickBonus: 10,  pasivo: 10},
+
+    { id: 'hierro',    costeBase: 50_000,        clickBonus: 10,  pasivo: 10,     desbloquea1: 'lapiz',      desbloquea2: 'armadura',   desbloquea1: 'golem_hierro' },
+    { id: 'armadura',  costeBase: 500_000,       clickBonus: 10,  pasivo: 50},
+    { id: 'golem_hierro', costeBase: 5_000_000,  clickBonus: 50,  pasivo: 250},
+
+    { id: 'lapiz',     costeBase: 500_000,       clickBonus: 10,  pasivo: 50,     desbloquea1: 'redstone',   desbloquea2: 'enchants', desbloquea3: 'libro_encantado' },
+    { id: 'enchants',  costeBase: 5_000_000,     clickBonus: 50,  pasivo: 250},
+    { id: 'book_enchant', costeBase: 50_000_000, clickBonus: 50, pasivo: 1_250},
+
+    { id: 'redstone',  costeBase: 5_000_000,     clickBonus: 50,  pasivo: 250,    desbloquea1: 'esmeralda',  desbloquea2: 'minas_plus', desbloquea3: 'granja'  },
+    { id: 'minas_plus', costeBase: 50_000_000,   clickBonus: 50,  pasivo: 1_250},
+    { id: 'granjas',   costeBase: 50_000_000,    clickBonus: 50,  pasivo: 1_250 },
+
+    { id: 'esmeralda', costeBase: 50_000_000,    clickBonus: 100, pasivo: 1_250,  desbloquea1: 'diamante',   desbloquea2: 'aldeano' },
+    { id: 'aldeano',   costeBase: 500_000_000,   clickBonus: 100, pasivo: 6_250,  desbloquea3: 'tradeos' },
+    { id: 'tradeos',   costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250},
+
+    { id: 'diamante',  costeBase: 500_000_000,   clickBonus: 250, pasivo: 6_250,  desbloquea1: 'obsidiana', desbloquea2: 'mejora_armadura' },
+    { id: 'mejora_armadura', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea3: 'pico_diamante' },
+    { id: 'pico_diamante', costeBase: 50_000_000_000, clickBonus: 250, pasivo: 156_250},
+
+    { id: 'obsidiana', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea1: 'nether' },
+    { id: 'nether',   costeBase: 50_000_000_000, clickBonus: 500, pasivo: 156_250, desbloquea1: null },
 ];
 MEJORAS.forEach((m, i) => { m.oculto = i > 0; });
 
@@ -120,6 +153,7 @@ function desbloquearMejora(id) {
     estado[id].desbloqueada = true;
     refs[id].slot.classList.remove('locked');
 }
+
 
 function comprar(m) {
     if (!cargado) return;
