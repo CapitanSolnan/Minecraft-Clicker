@@ -8,7 +8,14 @@ export const translations = {
         loadError: 'Error al cargar ✖', offlineGain: 'Mientras no estabas: +{n}',
         conflict: 'Partida modificada en otro dispositivo o pestaña. Recarga la página.',
         leaveUnsaved: 'No se pudo guardar. ¿Salir y perder el progreso reciente?',
-        items: { tronco: 'Tronco', piedra: 'Piedra', carbon: 'Carbón', hierro: 'Hierro', lapiz: 'Lapislázuli', redstone: 'Redstone', oro: 'Oro', diamante: 'Diamante', obsidiana: 'Obsidiana' },
+        items: {
+            tronco: 'Tronco', piedra: 'Piedra', carbon: 'Carbón', hierro: 'Hierro', lapiz: 'Lapislázuli', redstone: 'Redstone', oro: 'Oro', diamante: 'Diamante', obsidiana: 'Obsidiana',
+            cortador: 'Cortador', tablones: 'Tablones', afilador: 'Afilador', mina: 'Mina', horno: 'Horno',
+            piedra_lisa: 'Piedra lisa', cobre: 'Cobre', copper_golem: 'Gólem de cobre', copper_chest: 'Cofre de cobre',
+            armadura: 'Armadura', golem_hierro: 'Gólem de hierro', enchants: 'Encantamientos', book_enchant: 'Libro encantado',
+            minas_plus: 'Minas+', granjas: 'Granjas', esmeralda: 'Esmeralda', aldeano: 'Aldeano', tradeos: 'Tradeos',
+            mejora_armadura: 'Mejora de armadura', pico_diamante: 'Pico de diamante', nether: 'Nether',
+        },
         loginPageTitle: 'Minecraft Clicker - Login', authTitle: 'Iniciar Sesión / Registrarse', email: 'Correo electrónico',
         password: 'Contraseña', register: 'Registrarse', login: 'Iniciar Sesión', google: 'Iniciar sesión con Google',
         forgot: '¿Olvidaste tu contraseña?', checkingSession: 'Comprobando sesión...', loginPrompt: 'Por favor, inicia sesión para jugar.',
@@ -16,6 +23,7 @@ export const translations = {
         errEmailInUse: 'Ese correo ya está registrado.', errInvalid: 'Correo o contraseña incorrectos.', errEmail: 'El correo no es válido.',
         errWeak: 'La contraseña debe tener al menos 6 caracteres.', errNetwork: 'Error de red. Revisa tu conexión.', errGeneric: 'Algo salió mal. Inténtalo de nuevo.',
         errTooMany: 'Demasiados intentos. Espera un poco e inténtalo de nuevo.',
+
     },
     en: {
         title: 'Minecraft Clicker', timer: 'Time elapsed:', save: 'Save Progress', logout: 'Log out',
@@ -26,7 +34,14 @@ export const translations = {
         loadError: 'Error loading ✖', offlineGain: 'While you were away: +{n}',
         conflict: 'Game changed on another device or tab. Reload the page.',
         leaveUnsaved: 'Could not save. Leave and lose recent progress?',
-        items: { tronco: 'Log', piedra: 'Stone', carbon: 'Coal', hierro: 'Iron', lapiz: 'Lapis Lazuli', redstone: 'Redstone', oro: 'Gold', diamante: 'Diamond', obsidiana: 'Obsidian' },
+        items: {
+            tronco: 'Log', piedra: 'Stone', carbon: 'Coal', hierro: 'Iron', lapiz: 'Lapis Lazuli', redstone: 'Redstone', oro: 'Gold', diamante: 'Diamond', obsidiana: 'Obsidian',
+            cortador: 'Stonecutter', tablones: 'Planks', afilador: 'Grindstone', mina: 'Mine', horno: 'Furnace',
+            piedra_lisa: 'Smooth Stone', cobre: 'Copper', copper_golem: 'Copper Golem', copper_chest: 'Copper Chest',
+            armadura: 'Armor', golem_hierro: 'Iron Golem', enchants: 'Enchantments', book_enchant: 'Enchanted Book',
+            minas_plus: 'Mines+', granjas: 'Farms', esmeralda: 'Emerald', aldeano: 'Villager', tradeos: 'Trades',
+            mejora_armadura: 'Armor Upgrade', pico_diamante: 'Diamond Pickaxe', nether: 'Nether',
+        },
         loginPageTitle: 'Minecraft Clicker - Login', authTitle: 'Login / Register', email: 'Email',
         password: 'Password', register: 'Register', login: 'Login', google: 'Login with Google',
         forgot: 'Forgot your password?', checkingSession: 'Checking session...', loginPrompt: 'Please log in to play.',
@@ -34,6 +49,7 @@ export const translations = {
         errEmailInUse: 'That email is already registered.', errInvalid: 'Wrong email or password.', errEmail: 'The email is not valid.',
         errWeak: 'The password must be at least 6 characters.', errNetwork: 'Network error. Check your connection.', errGeneric: 'Something went wrong. Try again.',
         errTooMany: 'Too many attempts. Wait a bit and try again.',
+
     },
     ca: {
         title: 'Minecraft Clicker', timer: 'Temps transcorregut:', save: 'Desar progrés', logout: 'Tancar sessió',
@@ -44,7 +60,14 @@ export const translations = {
         loadError: 'Error en carregar ✖', offlineGain: 'Mentre no hi eres: +{n}',
         conflict: 'Partida modificada en un altre dispositiu o pestanya. Recarrega la pàgina.',
         leaveUnsaved: "No s'ha pogut desar. Vols sortir i perdre el progrés recent?",
-        items: { tronco: 'Tronc', piedra: 'Pedra', carbon: 'Carbó', hierro: 'Ferro', lapiz: 'Lapislàtzuli', redstone: 'Redstone', oro: 'Or', diamante: 'Diamant', obsidiana: 'Obsidiana' },
+        items: {
+            tronco: 'Tronc', piedra: 'Pedra', carbon: 'Carbó', hierro: 'Ferro', lapiz: 'Lapislàtzuli', redstone: 'Redstone', oro: 'Or', diamante: 'Diamant', obsidiana: 'Obsidiana',
+            cortador: 'Talla-pedres', tablones: 'Taulons', afilador: 'Esmolet', mina: 'Mina', horno: 'Forn',
+            piedra_lisa: 'Pedra llisa', cobre: 'Coure', copper_golem: 'Gòlem de coure', copper_chest: 'Cofre de coure',
+            armadura: 'Armadura', golem_hierro: 'Gòlem de ferro', enchants: 'Encanteris', book_enchant: 'Llibre encantat',
+            minas_plus: 'Mines+', granjas: 'Granges', esmeralda: 'Maragda', aldeano: 'Vilatà', tradeos: 'Intercanvis',
+            mejora_armadura: "Millora d'armadura", pico_diamante: 'Pic de diamant', nether: 'Nether',
+        },
         loginPageTitle: 'Minecraft Clicker - Login', authTitle: 'Iniciar Sessió / Registrar-se', email: 'Correu electrònic',
         password: 'Contrasenya', register: 'Registrar-se', login: 'Iniciar Sessió', google: 'Iniciar sessió amb Google',
         forgot: 'Has oblidat la contrasenya?', checkingSession: 'Comprovant sessió...', loginPrompt: 'Inicia sessió per jugar.',
@@ -52,6 +75,7 @@ export const translations = {
         errEmailInUse: 'Aquest correu ja està registrat.', errInvalid: 'Correu o contrasenya incorrectes.', errEmail: 'El correu no és vàlid.',
         errWeak: 'La contrasenya ha de tenir almenys 6 caràcters.', errNetwork: 'Error de xarxa. Revisa la connexió.', errGeneric: "Alguna cosa ha fallat. Torna-ho a provar.",
         errTooMany: 'Massa intents. Espera una mica i torna-ho a provar.',
+
     },
 };
 
@@ -89,4 +113,3 @@ export function setLang(lang, onChange) {
 
     if (onChange) onChange();
 }
-

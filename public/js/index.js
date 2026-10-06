@@ -6,9 +6,7 @@ import {
 import { t, setLang, getLang } from "./i18n.js";
 
 
-let consentimiento = false;
-try { consentimiento = localStorage.getItem('analytics-consent') === 'yes'; } catch { /* ignorar */ }
-if (consentimiento) {
+function iniciarAnalytics() {
     import("https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js")
         .then(m => m.getAnalytics(app)).catch(() => {});
 }

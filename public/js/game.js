@@ -2,9 +2,11 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { auth, db } from "./firebase.js";
 import { t, tItem, setLang, getLang } from "./i18n.js";
+import {
+    desbloqueosDe, MAX_CANTIDAD, MEJORAS, costeDe as costeN, ventaDe as ventaN,
+    num, formatear as formatearNum, formatearTiempo
+} from "./logic.js";
 
-// ── Configuración
-const CRECIMIENTO = 1.15;
 const MAX_OFFLINE_S = 8 * 3600;
 const AUTOSAVE_MS = 60 * 1000;
 const TICK_MS = 250;
@@ -13,87 +15,19 @@ const STATUS_MS = 3000;
 const RETRY_MS = 5000;
 const SALIDA_DEBOUNCE_MS = 2000;
 const RESPALDO_MS = 10 * 1000;
-const UNIDADES_DESBLOQUEO = 10;
-const MAX_CANTIDAD = 1000;
 const LS_PREFIX = 'mc-clicker-save-';
 
-
-//Desbloquea1 -> 10
-//Desbloquea2 -> 32
-//Desbloquea3 -> 64
-const MEJORAS = [
-    { id: 'tronco',    costeBase: 10,            clickBonus: 1,   pasivo: 0,      desbloquea1: 'piedra',     desbloquea2: 'cortador',  desbloquea3: 'tablones'},
-    { id: 'cortador',  costeBase: 50,            clickBonus: 1,   pasivo: 0},
-    { id: 'tablones',  costeBase: 50,            clickBonus: 1,   pasivo: 0},
-
-    { id: 'piedra',    costeBase: 100,           clickBonus: 5,   pasivo: 0,      desbloquea1: 'carbon',     desbloquea2: 'afilador', desbloquea3: 'mina' },
-    { id: 'afilador',  costeBase: 500,           clickBonus: 5,   pasivo: 0},
-    { id: 'mina',      costeBase: 500,           clickBonus: 5,   pasivo: 0},
-
-    { id: 'carbon',    costeBase: 1_000,         clickBonus: 5,   pasivo: 2,      desbloquea1: 'cobre',      desbloquea2: 'horno', desbloquea3: 'piedra_lisa'  },
-    { id: 'horno',      costeBase: 5_000,        clickBonus: 5,   pasivo: 10},
-    { id: 'piedra_lisa', costeBase: 5_000,       clickBonus: 5,   pasivo: 10},
-
-    { id: 'cobre',     costeBase: 10_000,        clickBonus: 10,  pasivo: 10,     desbloquea1: 'hierro',     desbloquea2: 'copper_golem', desbloquea3: 'copper_chest' },
-    {id: 'copper_golem', costeBase: 50_000,      clickBonus: 10,  pasivo: 10},
-    {id: 'copper_chest', costeBase: 50_000,      clickBonus: 10,  pasivo: 10},
-
-    { id: 'hierro',    costeBase: 50_000,        clickBonus: 10,  pasivo: 10,     desbloquea1: 'lapiz',      desbloquea2: 'armadura',   desbloquea1: 'golem_hierro' },
-    { id: 'armadura',  costeBase: 500_000,       clickBonus: 10,  pasivo: 50},
-    { id: 'golem_hierro', costeBase: 5_000_000,  clickBonus: 50,  pasivo: 250},
-
-    { id: 'lapiz',     costeBase: 500_000,       clickBonus: 10,  pasivo: 50,     desbloquea1: 'redstone',   desbloquea2: 'enchants', desbloquea3: 'libro_encantado' },
-    { id: 'enchants',  costeBase: 5_000_000,     clickBonus: 50,  pasivo: 250},
-    { id: 'book_enchant', costeBase: 50_000_000, clickBonus: 50, pasivo: 1_250},
-
-    { id: 'redstone',  costeBase: 5_000_000,     clickBonus: 50,  pasivo: 250,    desbloquea1: 'esmeralda',  desbloquea2: 'minas_plus', desbloquea3: 'granja'  },
-    { id: 'minas_plus', costeBase: 50_000_000,   clickBonus: 50,  pasivo: 1_250},
-    { id: 'granjas',   costeBase: 50_000_000,    clickBonus: 50,  pasivo: 1_250 },
-
-    { id: 'esmeralda', costeBase: 50_000_000,    clickBonus: 100, pasivo: 1_250,  desbloquea1: 'diamante',   desbloquea2: 'aldeano' },
-    { id: 'aldeano',   costeBase: 500_000_000,   clickBonus: 100, pasivo: 6_250,  desbloquea3: 'tradeos' },
-    { id: 'tradeos',   costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250},
-
-    { id: 'diamante',  costeBase: 500_000_000,   clickBonus: 250, pasivo: 6_250,  desbloquea1: 'obsidiana', desbloquea2: 'mejora_armadura' },
-    { id: 'mejora_armadura', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea3: 'pico_diamante' },
-    { id: 'pico_diamante', costeBase: 50_000_000_000, clickBonus: 250, pasivo: 156_250},
-
-    { id: 'obsidiana', costeBase: 5_000_000_000, clickBonus: 250, pasivo: 31_250, desbloquea1: 'nether' },
-    { id: 'nether',   costeBase: 50_000_000_000, clickBonus: 500, pasivo: 156_250, desbloquea1: null },
-];
-MEJORAS.forEach((m, i) => { m.oculto = i > 0; });
-
-// ── Estado
 let contador = 0;
 let timer = 0;
 const estado = {};
 MEJORAS.forEach(m => { estado[m.id] = { cantidad: 0, desbloqueada: !m.oculto }; });
 
-const costeDe   = (m, n = estado[m.id].cantidad) => Math.floor(m.costeBase * CRECIMIENTO ** n);
-const ventaDe   = m => Math.floor(costeDe(m, estado[m.id].cantidad - 1) / 2);
+const costeDe   = (m, n = estado[m.id].cantidad) => costeN(m, n);
+const ventaDe   = m => ventaN(m, estado[m.id].cantidad);
 const calcularPasivo     = () => MEJORAS.reduce((s, m) => s + estado[m.id].cantidad * m.pasivo, 0);
 const calcularBonusClick = () => MEJORAS.reduce((s, m) => s + estado[m.id].cantidad * m.clickBonus, 0);
 
-// ── Formato
-const SUFIJOS = ['', 'k', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
-function formatear(n) {
-    if (!isFinite(n)) return '∞';
-    const signo = n < 0 ? '-' : '';
-    n = Math.abs(n);
-    if (n < 1000) return signo + new Intl.NumberFormat(getLang(), { maximumFractionDigits: 2 }).format(Math.floor(n * 100) / 100);
-    let i = Math.min(Math.floor(Math.log10(n) / 3), SUFIJOS.length - 1);
-    let v = Math.floor(n / 1000 ** i * 100) / 100;
-    if (v >= 1000 && i < SUFIJOS.length - 1) { v = Math.floor(v / 1000 * 100) / 100; i++; }
-    return signo + new Intl.NumberFormat(getLang(), { maximumFractionDigits: 2 }).format(v) + SUFIJOS[i];
-}
-function formatearTiempo(s) {
-    s = Math.floor(s);
-    const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, seg = s % 60;
-    const p = n => String(n).padStart(2, '0');
-    if (h > 0) return h + 'h ' + p(m) + 'm ' + p(seg) + 's';
-    if (m > 0) return m + 'm ' + p(seg) + 's';
-    return seg + 's';
-}
+const formatear = n => formatearNum(n, getLang());
 
 const setText = (el, txt) => { if (el.textContent !== txt) el.textContent = txt; };
 const setDisabled = (el, v) => { if (el.disabled !== v) el.disabled = v; };
@@ -154,7 +88,6 @@ function desbloquearMejora(id) {
     refs[id].slot.classList.remove('locked');
 }
 
-
 function comprar(m) {
     if (!cargado) return;
     const e = estado[m.id];
@@ -162,7 +95,7 @@ function comprar(m) {
     if (contador < coste || e.cantidad >= MAX_CANTIDAD) return;
     contador -= coste;
     e.cantidad++;
-    if (e.cantidad >= UNIDADES_DESBLOQUEO) desbloquearMejora(m.desbloquea);
+    desbloqueosDe(m, e.cantidad).forEach(desbloquearMejora);
     renderTodo();
 }
 
@@ -210,8 +143,6 @@ function mostrarEstado(key, params, fijo = false) {
     if (!fijo) statusTimeout = setTimeout(() => { elStatus.textContent = ''; }, STATUS_MS);
 }
 
-const num = (v, def = 0) => { v = Number(v); return Number.isFinite(v) ? v : def; };
-
 function crearSave() {
     const save = { contador, timer, lastSeen: Date.now(), estado: {} };
     MEJORAS.forEach(m => {
@@ -229,7 +160,7 @@ function aplicarSave(save) {
         estado[m.id].cantidad = Math.min(MAX_CANTIDAD, Math.max(0, Math.floor(num(s.cantidad))));
         if (s.desbloqueada || !m.oculto) desbloquearMejora(m.id);
     });
-    MEJORAS.forEach(m => { if (estado[m.id].cantidad >= UNIDADES_DESBLOQUEO) desbloquearMejora(m.desbloquea); });
+    MEJORAS.forEach(m => desbloqueosDe(m, estado[m.id].cantidad).forEach(desbloquearMejora));
 
     // Progreso offline
     const lejos = Math.min(Math.max((Date.now() - num(save.lastSeen, Date.now())) / 1000, 0), MAX_OFFLINE_S);
@@ -240,8 +171,8 @@ function aplicarSave(save) {
 }
 
 function respaldoLocal() {
-    if (!uid || !cargado) return;
-    try { localStorage.setItem(LS_PREFIX + uid, JSON.stringify({ ...crearSave(), version })); } catch { /* ignorar */ }
+    if (!uid || !cargado || bloqueado) return;
+    try { localStorage.setItem(LS_PREFIX + uid, JSON.stringify({ ...crearSave(), version })); } catch {}
 }
 function leerRespaldo() {
     try { return JSON.parse(localStorage.getItem(LS_PREFIX + uid)); } catch { return null; }
