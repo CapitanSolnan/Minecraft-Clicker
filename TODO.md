@@ -3,12 +3,21 @@
 Lista de tareas pendientes y mejoras planeadas para el desarrollo de **Minecraft-Clicker**.
 
 ---
+## Mejoras de un solo uso
+- [ ] Cortador x2 Tronco
+- [ ] Afilador x2 Piedra
+- [ ] Horno x2 piedra
+- [ ] Golem de cobre x cobre
+- [ ] Golem de hierro x2 hierro8
+- [ ] Libro encantado x2 lapiz
+- [ ] Observer x2 redstone
+- [ ] Mina x2 |  Railes x4 | Pico diamante x8 | PASIVOS
+- [ ] Armadura Cobre x2 | Hierro x4 | Diamente x8 | CLICKS
+
+
+
 ## 🌍 Overworld 
-- [ ] 🪨 **Mina**
-- [ ] 🔵 **Encantamientos**
-- [ ] 💚 **Tradeos**
-- [ ] 💎 **Armadura**
-- [ ] ⛏️ **Pico de diamante**
+- [ ] 🔵 **Encantamientos** *Activa impulsos en un cierto tiempo*
 
 ---
 *Falta Pensarlo Mejor*
